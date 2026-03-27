@@ -1,0 +1,139 @@
+import { useState, useContext } from "react";
+import { AuthContext } from "../context/AuthContext";
+import { useNavigate, Link } from "react-router-dom";
+
+const Login = () => {
+  const [telefono, setTelefono] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false); // 🔥 Estado para el ojito
+  const [loading, setLoading] = useState(false); // 🔥 Estado de carga
+
+  const { login } = useContext(AuthContext);
+  const navigate = useNavigate();
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      // 1. IMPORTANTE: Asegúrate que AuthContext retorne el objeto del usuario
+      const data = await login({ telefono, password });
+
+      // 2. Extraemos los datos (dependiendo de cómo los mande tu backend)
+      const user = data?.user || data;
+      const rol = user?.rol;
+      const nombre = user?.nombre || "Usuario";
+
+      alert(`¡Hola de nuevo, ${nombre}! 🔥`);
+
+      // 3. Redirección lógica basada en el ROL
+      switch (rol) {
+        case "admin":
+          navigate("/admin");
+          break;
+        case "repartidor":
+          navigate("/repartidor"); // Si tienes una ruta de repartidor
+          break;
+        default:
+          navigate("/"); // Clientes al catálogo
+          break;
+      }
+    } catch (error) {
+      console.error("Error en login:", error);
+      alert(
+        error.response?.data?.message || "Teléfono o contraseña incorrectos",
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="flex items-center justify-center min-h-screen bg-orange-50 p-4">
+      <form
+        onSubmit={handleSubmit}
+        className="p-8 bg-white shadow-xl rounded-2xl w-full max-w-md border-t-8 border-orange-500 animate-in fade-in zoom-in duration-300"
+      >
+        <div className="text-center mb-6">
+          <h2 className="text-3xl font-black text-gray-800 tracking-tighter uppercase">
+            🪵 LEÑOS <span className="text-orange-600">RELLENOS</span>
+          </h2>
+          <p className="text-gray-500 text-sm mt-2">
+            Inicia sesión con tu número de teléfono
+          </p>
+        </div>
+
+        <div className="space-y-4">
+          <div>
+            <label className="block text-gray-700 font-bold mb-1 text-sm">
+              Teléfono
+            </label>
+            <input
+              type="text"
+              className="w-full px-4 py-3 border-2 rounded-xl focus:border-orange-500 outline-none transition-all placeholder:text-gray-300"
+              value={telefono}
+              onChange={(e) => setTelefono(e.target.value)}
+              placeholder="Ej. 4615289540"
+              required
+            />
+          </div>
+
+          <div className="relative">
+            <label className="block text-gray-700 font-bold mb-1 text-sm">
+              Contraseña
+            </label>
+            <input
+              type={showPassword ? "text" : "password"}
+              className="w-full px-4 py-3 border-2 rounded-xl focus:border-orange-500 outline-none transition-all placeholder:text-gray-300"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="••••••••"
+              required
+            />
+            {/* Botón del ojito */}
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-4 top-10 text-xl"
+            >
+              {showPassword ? "🙈" : "👁️"}
+            </button>
+          </div>
+        </div>
+
+        <div className="text-right mt-3">
+          <Link
+            to="/forgot-password"
+            className="text-xs font-bold text-orange-600 hover:text-orange-800 transition-colors uppercase tracking-wider"
+          >
+            ¿Olvidaste tu contraseña?
+          </Link>
+        </div>
+
+        <button
+          type="submit"
+          disabled={loading}
+          className={`w-full mt-6 ${
+            loading ? "bg-gray-400" : "bg-orange-500 hover:bg-orange-600"
+          } text-white font-black py-4 rounded-xl transition-all duration-300 shadow-lg transform active:scale-95 uppercase tracking-widest`}
+        >
+          {loading ? "VERIFICANDO..." : "ENTRAR"}
+        </button>
+
+        <div className="mt-8 text-center border-t border-gray-100 pt-6">
+          <p className="text-gray-600 text-sm font-medium">
+            ¿No tienes cuenta?{" "}
+            <Link
+              to="/register"
+              className="text-orange-600 font-black hover:underline"
+            >
+              REGÍSTRATE AQUÍ
+            </Link>
+          </p>
+        </div>
+      </form>
+    </div>
+  );
+};
+
+export default Login;
