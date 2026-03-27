@@ -10,7 +10,7 @@ const AuthProvider = ({ children }) => {
   useEffect(() => {
     const cargarUsuario = () => {
       const token = localStorage.getItem("token");
-      const usuarioGuardado = localStorage.getItem("user"); // <--- IMPORTANTE: Leer el usuario
+      const usuarioGuardado = localStorage.getItem("user");
 
       if (token && usuarioGuardado) {
         try {
