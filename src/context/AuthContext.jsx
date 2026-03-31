@@ -28,7 +28,7 @@ const AuthProvider = ({ children }) => {
   }, []);
 
   const login = async (datos) => {
-    const respuesta = await clienteAxios.post("api/users/login", datos);
+    const respuesta = await clienteAxios.post("/api/users/login", datos);
 
     // 1. Guardamos AMBAS cosas en localStorage
     localStorage.setItem("token", respuesta.data.token);
