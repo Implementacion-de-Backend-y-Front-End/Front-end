@@ -1,16 +1,16 @@
 import axios from "axios";
 
 const clienteAxios = axios.create({
-  // 1. Prioridad: Usa la variable de entorno de Railway, si no existe, usa localhost
-  baseURL: import.meta.env.VITE_API_URL || "http://localhost:4000/api",
+  // CAMBIO AQUÍ: Escribe la URL de tu backend directamente entre comillas
+  // Esto elimina el error 404 porque Axios ya no "adivinará" la ruta.
+  baseURL: "https://backend-production-0532.up.railway.app/api",
 });
 
-// Interceptor para enviar el token en los headers siempre
+// Tu interceptor está perfecto, NO lo cambies
 clienteAxios.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("token");
     if (token) {
-      // Asegúrate de que tu Backend use este mismo nombre: 'x-auth-token'
       config.headers["x-auth-token"] = token;
     }
     return config;
