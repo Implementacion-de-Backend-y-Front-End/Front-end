@@ -1,12 +1,10 @@
 import axios from "axios";
 
 const clienteAxios = axios.create({
-  // CAMBIO AQUÍ: Escribe la URL de tu backend directamente entre comillas
-  // Esto elimina el error 404 porque Axios ya no "adivinará" la ruta.
-  baseURL: "https://backend-production-0532.up.railway.app/api",
+  // Escribe la URL de tu backend directamente SIN el /api al final
+  baseURL: "https://backend-production-0532.up.railway.app",
 });
 
-// Tu interceptor está perfecto, NO lo cambies
 clienteAxios.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("token");
@@ -15,9 +13,7 @@ clienteAxios.interceptors.request.use(
     }
     return config;
   },
-  (error) => {
-    return Promise.reject(error);
-  },
+  (error) => Promise.reject(error),
 );
 
 export default clienteAxios;
