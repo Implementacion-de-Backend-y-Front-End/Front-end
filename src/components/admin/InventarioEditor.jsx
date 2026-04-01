@@ -10,21 +10,16 @@ const InventarioEditor = ({ refresh }) => {
     precio: "",
     stock: "",
     descripcion: "",
-    categoria: "Dulce",
+    categoria: "Dulce", // Valor por defecto
   });
 
-  // 🔥 Lógica de Vista Previa Reforzada
   useEffect(() => {
     if (!file) {
       setPreview(null);
       return;
     }
-
-    // Crear URL temporal para la imagen seleccionada
     const objectUrl = URL.createObjectURL(file);
     setPreview(objectUrl);
-
-    // Limpiar memoria al desmontar
     return () => URL.revokeObjectURL(objectUrl);
   }, [file]);
 
@@ -47,8 +42,6 @@ const InventarioEditor = ({ refresh }) => {
       });
 
       alert("¡Leño guardado con éxito! 🪵🔥");
-
-      // Limpiar todo
       setFormData({
         nombre: "",
         precio: "",
@@ -57,8 +50,7 @@ const InventarioEditor = ({ refresh }) => {
         categoria: "Dulce",
       });
       setFile(null);
-
-      if (refresh) refresh(); // 🔥 Esto debe volver a ejecutar el GET del inventario
+      if (refresh) refresh();
     } catch (error) {
       console.error("Error al subir:", error);
       alert("Error al guardar el producto");
@@ -105,6 +97,25 @@ const InventarioEditor = ({ refresh }) => {
           />
         </div>
 
+        {/* --- NUEVO: SELECTOR DE CATEGORÍA --- */}
+        <div className="flex flex-col gap-2">
+          <label className="text-xs font-black uppercase text-slate-500 ml-2">
+            Categoría
+          </label>
+          <select
+            className="w-full bg-[#0f172a] border border-slate-800 p-4 rounded-2xl outline-none focus:border-orange-500 appearance-none cursor-pointer"
+            value={formData.categoria}
+            onChange={(e) =>
+              setFormData({ ...formData, categoria: e.target.value })
+            }
+          >
+            <option value="Dulce">Dulce 🍯</option>
+            <option value="Salado">Salado 🥓</option>
+            <option value="Especial">Especial ✨</option>
+            <option value="Bebida">Bebida 🥤</option>
+          </select>
+        </div>
+
         <textarea
           className="w-full bg-[#0f172a] border border-slate-800 p-4 rounded-2xl h-24 outline-none focus:border-orange-500 resize-none"
           placeholder="Descripción..."
@@ -131,7 +142,6 @@ const InventarioEditor = ({ refresh }) => {
             {file ? "Cambiar Imagen" : "Seleccionar Foto"}
           </label>
 
-          {/* VISTA PREVIA DEL ARCHIVO LOCAL */}
           <div className="mt-4 flex justify-center">
             {preview ? (
               <img

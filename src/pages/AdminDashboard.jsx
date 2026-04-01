@@ -42,18 +42,11 @@ const AdminDashboard = () => {
 
           {/* 3. GESTIÓN DE STOCK */}
           {activeTab === "stock" && (
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              {/* 🔥 CAMBIO CLAVE: Cambié onSuccess por refresh para que coincida con el componente */}
-              <InventarioEditor refresh={fetchInventario} />
-
-              {/* Opcional: Si quieres ver la lista aquí mismo para no cambiar de pestaña, 
-                  puedes poner <CatalogoStock /> en lugar de este div vacío 
-              */}
-              <div className="bg-[#1e293b] p-6 rounded-3xl border border-slate-800 text-center flex flex-col justify-center">
-                <p className="text-slate-500 uppercase font-black italic">
-                  Producto guardado correctamente. Revisa la pestaña de
-                  Catálogo.
-                </p>
+            <div className="flex justify-center items-start animate-in zoom-in duration-300">
+              <div className="w-full max-w-2xl">
+                {/* Pasamos refresh para que cuando guardes, 
+          se actualice la lista de la otra pestaña automáticamente */}
+                <InventarioEditor refresh={fetchInventario} />
               </div>
             </div>
           )}
