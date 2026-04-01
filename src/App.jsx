@@ -5,7 +5,7 @@ import {
   Navigate,
 } from "react-router-dom";
 import { useContext } from "react";
-import { AuthContext } from "./context/AuthContext"; // Asegúrate de que la ruta sea correcta
+import { AuthContext } from "./context/AuthContext";
 import AuthProvider from "./context/AuthContext";
 import Navbar from "./components/Navbar";
 import Login from "./pages/Login";
@@ -14,8 +14,9 @@ import Profile from "./pages/Profile";
 import ForgotPassword from "./pages/ForgotPassword";
 import Home from "./pages/Home";
 import AdminDashboard from "./pages/AdminDashboard";
+import Checkout from "./pages/Checkout"; // 🔥 Importado
 
-// --- COMPONENTE DE PROTECCIÓN ---
+// --- COMPONENTE DE PROTECCIÓN ADMIN ---
 const AdminRoute = ({ children }) => {
   const { user, loading } = useContext(AuthContext);
   if (loading)
@@ -24,11 +25,20 @@ const AdminRoute = ({ children }) => {
         Cargando...
       </div>
     );
+  if (!user || user.rol !== "admin") return <Navigate to="/" />;
+  return children;
+};
 
-  // Si no es admin, lo mandamos al inicio (catálogo)
-  if (!user || user.rol !== "admin") {
-    return <Navigate to="/" />;
-  }
+// --- COMPONENTE DE PROTECCIÓN CLIENTE 🔥 ---
+const ClienteRoute = ({ children }) => {
+  const { user, loading } = useContext(AuthContext);
+  if (loading)
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        Cargando...
+      </div>
+    );
+  if (!user || user.rol === "admin") return <Navigate to="/login" />;
   return children;
 };
 
@@ -41,12 +51,19 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
-
-          {/* Rutas Protegidas para Clientes/Cualquiera Logueado */}
           <Route path="/perfil" element={<Profile />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
 
-          {/* 🔥 RUTA PROTEGIDA: Solo Admins pueden entrar aquí */}
+          {/* 🔥 Ruta Protegida Checkout */}
+          <Route
+            path="/checkout"
+            element={
+              <ClienteRoute>
+                <Checkout />
+              </ClienteRoute>
+            }
+          />
+
           <Route
             path="/admin"
             element={

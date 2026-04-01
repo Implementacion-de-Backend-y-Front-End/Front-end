@@ -5,8 +5,8 @@ import { useNavigate, Link } from "react-router-dom";
 const Login = () => {
   const [telefono, setTelefono] = useState("");
   const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false); // 🔥 Estado para el ojito
-  const [loading, setLoading] = useState(false); // 🔥 Estado de carga
+  const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const { login } = useContext(AuthContext);
   const navigate = useNavigate();
@@ -16,26 +16,23 @@ const Login = () => {
     setLoading(true);
 
     try {
-      // 1. IMPORTANTE: Asegúrate que AuthContext retorne el objeto del usuario
       const data = await login({ telefono, password });
 
-      // 2. Extraemos los datos (dependiendo de cómo los mande tu backend)
       const user = data?.user || data;
       const rol = user?.rol;
       const nombre = user?.nombre || "Usuario";
 
       alert(`¡Hola de nuevo, ${nombre}! 🔥`);
 
-      // 3. Redirección lógica basada en el ROL
       switch (rol) {
         case "admin":
           navigate("/admin");
           break;
         case "repartidor":
-          navigate("/repartidor"); // Si tienes una ruta de repartidor
+          navigate("/repartidor");
           break;
         default:
-          navigate("/"); // Clientes al catálogo
+          navigate("/checkout"); // 🔥 Corregido: Clientes van al Checkout
           break;
       }
     } catch (error) {
@@ -90,7 +87,6 @@ const Login = () => {
               placeholder="••••••••"
               required
             />
-            {/* Botón del ojito */}
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
