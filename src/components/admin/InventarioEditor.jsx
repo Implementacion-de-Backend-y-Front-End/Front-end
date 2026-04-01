@@ -13,22 +13,28 @@ const InventarioEditor = ({ refresh }) => {
     categoria: "Dulce",
   });
 
+  // 🔥 Lógica de Vista Previa Reforzada
   useEffect(() => {
     if (!file) {
       setPreview(null);
       return;
     }
+
+    // Crear URL temporal para la imagen seleccionada
     const objectUrl = URL.createObjectURL(file);
     setPreview(objectUrl);
+
+    // Limpiar memoria al desmontar
     return () => URL.revokeObjectURL(objectUrl);
   }, [file]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
+    if (!file) return alert("Por favor selecciona una imagen");
 
+    setLoading(true);
     const data = new FormData();
-    if (file) data.append("imagen", file);
+    data.append("imagen", file);
     data.append("nombre", formData.nombre);
     data.append("precio", formData.precio);
     data.append("stock", formData.stock);
@@ -39,7 +45,10 @@ const InventarioEditor = ({ refresh }) => {
       await clienteAxios.post("/api/products", data, {
         headers: { "Content-Type": "multipart/form-data" },
       });
+
       alert("¡Leño guardado con éxito! 🪵🔥");
+
+      // Limpiar todo
       setFormData({
         nombre: "",
         precio: "",
@@ -48,9 +57,11 @@ const InventarioEditor = ({ refresh }) => {
         categoria: "Dulce",
       });
       setFile(null);
-      if (refresh) refresh();
+
+      if (refresh) refresh(); // 🔥 Esto debe volver a ejecutar el GET del inventario
     } catch (error) {
-      alert(error.response?.data?.message || "Error al guardar");
+      console.error("Error al subir:", error);
+      alert("Error al guardar el producto");
     } finally {
       setLoading(false);
     }
@@ -58,15 +69,14 @@ const InventarioEditor = ({ refresh }) => {
 
   return (
     <div className="max-w-xl mx-auto bg-[#1e293b] p-8 rounded-3xl border border-slate-800 shadow-2xl text-white">
-      <h2 className="text-xl font-black uppercase italic mb-8 text-center text-orange-500 tracking-tighter">
+      <h2 className="text-xl font-black uppercase italic mb-8 text-center text-orange-500">
         NUEVO PRODUCTO
       </h2>
 
       <form onSubmit={handleSubmit} className="space-y-5">
-        {/* Datos Principales */}
         <input
-          className="w-full bg-[#0f172a] border border-slate-800 p-4 rounded-2xl outline-none focus:border-orange-500 transition-all placeholder:text-slate-600"
-          placeholder="Nombre (Ej: Leño Nutella)"
+          className="w-full bg-[#0f172a] border border-slate-800 p-4 rounded-2xl outline-none focus:border-orange-500"
+          placeholder="Nombre del Leño"
           value={formData.nombre}
           onChange={(e) => setFormData({ ...formData, nombre: e.target.value })}
           required
@@ -75,8 +85,8 @@ const InventarioEditor = ({ refresh }) => {
         <div className="grid grid-cols-2 gap-4">
           <input
             type="number"
-            className="bg-[#0f172a] border border-slate-800 p-4 rounded-2xl outline-none focus:border-orange-500 placeholder:text-slate-600"
-            placeholder="Precio ($)"
+            className="bg-[#0f172a] border border-slate-800 p-4 rounded-2xl outline-none focus:border-orange-500"
+            placeholder="Precio"
             value={formData.precio}
             onChange={(e) =>
               setFormData({ ...formData, precio: e.target.value })
@@ -85,7 +95,7 @@ const InventarioEditor = ({ refresh }) => {
           />
           <input
             type="number"
-            className="bg-[#0f172a] border border-slate-800 p-4 rounded-2xl outline-none focus:border-orange-500 placeholder:text-slate-600"
+            className="bg-[#0f172a] border border-slate-800 p-4 rounded-2xl outline-none focus:border-orange-500"
             placeholder="Stock"
             value={formData.stock}
             onChange={(e) =>
@@ -95,63 +105,43 @@ const InventarioEditor = ({ refresh }) => {
           />
         </div>
 
-        <select
-          className="w-full bg-[#0f172a] border border-slate-800 p-4 rounded-2xl outline-none focus:border-orange-500 cursor-pointer text-slate-300"
-          value={formData.categoria}
-          onChange={(e) =>
-            setFormData({ ...formData, categoria: e.target.value })
-          }
-        >
-          <option value="Dulce">🍩 Dulce</option>
-          <option value="Salado">🥓 Salado</option>
-          <option value="Especial">✨ Especial</option>
-        </select>
-
         <textarea
-          className="w-full bg-[#0f172a] border border-slate-800 p-4 rounded-2xl h-28 outline-none focus:border-orange-500 resize-none placeholder:text-slate-600"
-          placeholder="Descripción del leño..."
+          className="w-full bg-[#0f172a] border border-slate-800 p-4 rounded-2xl h-24 outline-none focus:border-orange-500 resize-none"
+          placeholder="Descripción..."
           value={formData.descripcion}
           onChange={(e) =>
             setFormData({ ...formData, descripcion: e.target.value })
           }
         />
 
-        {/* Sección de Carga e Imagen debajo */}
-        <div className="bg-[#0f172a] p-6 rounded-2xl border border-slate-800">
-          <label className="block text-xs font-black text-slate-500 mb-4 uppercase tracking-widest text-center">
-            Foto del Producto
+        <div className="bg-[#0f172a] p-6 rounded-2xl border border-slate-800 text-center">
+          <input
+            type="file"
+            accept="image/*"
+            id="file-upload"
+            className="hidden"
+            onChange={(e) => {
+              if (e.target.files[0]) setFile(e.target.files[0]);
+            }}
+          />
+          <label
+            htmlFor="file-upload"
+            className="bg-slate-800 hover:bg-slate-700 px-6 py-2 rounded-full cursor-pointer text-sm font-bold border border-slate-700 transition-all"
+          >
+            {file ? "Cambiar Imagen" : "Seleccionar Foto"}
           </label>
 
-          <div className="flex flex-col items-center space-y-4">
-            <input
-              type="file"
-              accept="image/*"
-              id="file-upload"
-              className="hidden"
-              onChange={(e) => setFile(e.target.files[0])}
-            />
-            <label
-              htmlFor="file-upload"
-              className="bg-slate-800 hover:bg-slate-700 text-white px-6 py-2 rounded-full cursor-pointer text-sm font-bold transition-all border border-slate-700"
-            >
-              {file ? "Cambiar Imagen" : "Seleccionar Archivo"}
-            </label>
-
-            {/* VISTA PREVIA INTEGRADA */}
+          {/* VISTA PREVIA DEL ARCHIVO LOCAL */}
+          <div className="mt-4 flex justify-center">
             {preview ? (
-              <div className="mt-4 w-full max-w-[200px] aspect-square rounded-2xl overflow-hidden border-2 border-orange-500/50 shadow-lg animate-in fade-in zoom-in duration-300">
-                <img
-                  src={preview}
-                  alt="Preview"
-                  className="w-full h-full object-cover"
-                />
-              </div>
+              <img
+                src={preview}
+                alt="Preview"
+                className="w-40 h-40 object-cover rounded-2xl border-2 border-orange-500 shadow-lg"
+              />
             ) : (
-              <div className="mt-4 w-full max-w-[200px] aspect-square rounded-2xl border-2 border-dashed border-slate-800 flex flex-col items-center justify-center text-slate-700">
-                <span className="text-4xl">📸</span>
-                <p className="text-[10px] uppercase font-black mt-2">
-                  Sin imagen
-                </p>
+              <div className="w-40 h-40 rounded-2xl border-2 border-dashed border-slate-800 flex items-center justify-center text-slate-700">
+                <span>📸 Sin foto</span>
               </div>
             )}
           </div>
@@ -159,9 +149,9 @@ const InventarioEditor = ({ refresh }) => {
 
         <button
           disabled={loading}
-          className={`w-full ${loading ? "bg-slate-700" : "bg-orange-600 hover:bg-orange-700"} py-5 rounded-2xl font-black uppercase tracking-[0.2em] transition-all shadow-xl active:scale-95 text-white`}
+          className="w-full bg-orange-600 hover:bg-orange-700 py-4 rounded-2xl font-black uppercase tracking-widest transition-all"
         >
-          {loading ? "PROCESANDO..." : "GUARDAR EN INVENTARIO"}
+          {loading ? "GUARDANDO..." : "GUARDAR PRODUCTO"}
         </button>
       </form>
     </div>
