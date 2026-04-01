@@ -14,7 +14,7 @@ import Profile from "./pages/Profile";
 import ForgotPassword from "./pages/ForgotPassword";
 import Home from "./pages/Home";
 import AdminDashboard from "./pages/AdminDashboard";
-import Checkout from "./pages/Checkout"; // 🔥 Importado
+import Checkout from "./components/Checkout";
 
 // --- COMPONENTE DE PROTECCIÓN ADMIN ---
 const AdminRoute = ({ children }) => {
