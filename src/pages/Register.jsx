@@ -32,7 +32,7 @@ const Register = () => {
 
     try {
       // 1. Enviar datos al Backend para crear la cuenta
-      const res = await clienteAxios.post("/users/register", formData);
+      const res = await clienteAxios.post("/api/users/register", formData);
 
       // 2. Login Automático
       // IMPORTANTE: Enviamos 'telefono' porque es lo que tu Backend usa para loguear
