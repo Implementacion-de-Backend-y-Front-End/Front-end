@@ -5,6 +5,18 @@ const CatalogoStock = ({ productos, refresh }) => {
   // 🔥 URL de tu backend para cargar las imágenes de la carpeta uploads
   const BACKEND_URL = "https://backend-production-0532.up.railway.app";
 
+  <img
+    src={`${BACKEND_URL}/uploads/${item.imagen}`} // 🪵 Debería quedar: https://.../uploads/nombre.jpg
+    alt={item.nombre}
+    className="w-full h-full object-cover"
+    onError={(e) => {
+      // Si falla, es porque la ruta está mal o el archivo no subió a Railway
+      console.log("Error cargando:", e.target.src);
+      e.target.style.display = "none";
+      e.target.parentElement.innerHTML = `<div class="w-full h-full flex items-center justify-center font-black text-orange-500">${item.nombre.charAt(0)}</div>`;
+    }}
+  />;
+
   const handleEliminar = async (id, nombre) => {
     const confirmar = window.confirm(`¿Seguro que quieres borrar "${nombre}"?`);
     if (!confirmar) return;
