@@ -32,7 +32,7 @@ const Login = () => {
           navigate("/repartidor");
           break;
         default:
-          navigate("/checkout"); // 🔥 Corregido: Clientes van al Checkout
+          navigate("/");
           break;
       }
     } catch (error) {
