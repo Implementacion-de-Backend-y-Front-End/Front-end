@@ -11,7 +11,13 @@ const Checkout = () => {
   );
   const [mostrarFormulario, setMostrarFormulario] = useState(false);
 
-  // --- ESTADO CORREGIDO PARA TU BACKEND ---
+  // --- FUNCIÓN PARA ELIMINAR DEL CARRITO ---
+  const eliminarDelCarrito = (id) => {
+    const nuevoCarrito = carrito.filter((item) => item._id !== id);
+    setCarrito(nuevoCarrito);
+    localStorage.setItem("carrito", JSON.stringify(nuevoCarrito));
+  };
+
   const [datosEnvio, setDatosEnvio] = useState({
     nombre: user?.nombre || "",
     telefono: user?.telefono || "",
@@ -19,7 +25,7 @@ const Checkout = () => {
     colonia: "",
     referencia: "",
     tipoEntrega: "Hoy",
-    fechaEntrega: new Date().toISOString(), // Formato ISO para el validador de horario
+    fechaEntrega: new Date().toISOString(),
   });
 
   const total = carrito.reduce(
@@ -29,12 +35,9 @@ const Checkout = () => {
 
   const enviarPedido = async (e) => {
     e.preventDefault();
-
-    // Armamos el objeto exactamente como lo espera tu createOrder
     const pedido = {
       nombre: datosEnvio.nombre,
       telefono: datosEnvio.telefono,
-      // Mapeamos a productoId, precioUnitario y subtotal como dice tu Schema
       productos: carrito.map((item) => ({
         productoId: item._id,
         nombre: item.nombre,
@@ -45,7 +48,6 @@ const Checkout = () => {
       total: total,
       fechaEntrega: datosEnvio.fechaEntrega,
       tipoEntrega: datosEnvio.tipoEntrega,
-      // Objeto direccion anidado {calle, colonia, referencia}
       direccion: {
         calle: datosEnvio.calle,
         colonia: datosEnvio.colonia,
@@ -56,19 +58,14 @@ const Checkout = () => {
 
     try {
       const res = await clienteAxios.post("/api/orders", pedido);
-
-      alert(res.data.message); // Muestra el folio generado (#1234)
-
-      // Si el backend generó link de WhatsApp, lo abrimos opcionalmente
+      alert(res.data.message);
       if (res.data.whatsappLink) {
         window.open(res.data.whatsappLink, "_blank");
       }
-
       localStorage.removeItem("carrito");
       navigate("/mis-pedidos");
     } catch (error) {
       console.error(error);
-      // Mostramos el error específico del backend (ej. Horario no disponible o Stock)
       alert(error.response?.data?.message || "Error al procesar el pedido");
     }
   };
@@ -83,7 +80,6 @@ const Checkout = () => {
   return (
     <div className="min-h-screen bg-slate-50 pb-24 p-4">
       {!mostrarFormulario ? (
-        /* VISTA 1: RESUMEN */
         <div className="max-w-md mx-auto bg-white rounded-3xl shadow-xl p-6 border border-slate-100">
           <h2 className="text-2xl font-black uppercase italic mb-6 border-b-4 border-orange-500 inline-block">
             Tu Carrito
@@ -94,7 +90,7 @@ const Checkout = () => {
                 key={item._id}
                 className="flex justify-between items-center bg-slate-50 p-3 rounded-2xl"
               >
-                <div>
+                <div className="flex-1">
                   <p className="font-black text-slate-800 uppercase text-sm">
                     {item.nombre}
                   </p>
@@ -102,7 +98,32 @@ const Checkout = () => {
                     {item.cantidad} x ${item.precio}
                   </p>
                 </div>
-                <p className="font-black">${item.cantidad * item.precio}</p>
+                <div className="flex items-center gap-4">
+                  <p className="font-black text-sm">
+                    ${item.cantidad * item.precio}
+                  </p>
+
+                  {/* BOTÓN ELIMINAR */}
+                  <button
+                    onClick={() => eliminarDelCarrito(item._id)}
+                    className="text-red-500 bg-red-50 p-2 rounded-xl active:scale-90 transition-all"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-4 w-4"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={3}
+                        d="M6 18L18 6M6 6l12 12"
+                      />
+                    </svg>
+                  </button>
+                </div>
               </div>
             ))}
           </div>
@@ -126,7 +147,6 @@ const Checkout = () => {
           </div>
         </div>
       ) : (
-        /* VISTA 2: FORMULARIO (Datos de Entrega) */
         <div className="max-w-md mx-auto bg-white rounded-3xl shadow-xl p-6">
           <h2 className="text-xl font-black mb-6 italic uppercase text-orange-600">
             Datos de Entrega
