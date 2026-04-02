@@ -81,7 +81,7 @@ const Checkout = () => {
     try {
       const res = await clienteAxios.post("/api/orders", pedido);
       alert(res.data.message);
-      if (res.data.whatsappLink) window.open(res.data.whatsappLink, "_blank");
+      //if (res.data.whatsappLink) window.open(res.data.whatsappLink, "_blank");
       localStorage.removeItem("carrito");
       navigate("/mis-pedidos");
     } catch (error) {
@@ -153,9 +153,7 @@ const Checkout = () => {
             onClick={() => setMostrarFormulario(true)}
             className={`w-full py-4 rounded-2xl font-black uppercase text-xs ${faltanLeños ? "bg-slate-200 text-slate-400" : "bg-orange-500 text-white shadow-lg shadow-orange-200"}`}
           >
-            {faltanLeños
-              ? `Faltan ${3 - totalUnidades} leños`
-              : "Continuar a Entrega"}
+            {faltanLeños ? `Faltan ${3 - totalUnidades} leños` : "Pedir"}
           </button>
         </div>
       ) : (
