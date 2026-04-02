@@ -18,7 +18,7 @@ const PedidosManager = () => {
   const fetchPedidos = async () => {
     try {
       setLoading(true);
-      const res = await clienteAxios.get("/admin/pending");
+      const res = await clienteAxios.get("/orders/pending");
       console.log("Pedido seleccionado:", pedidoSeleccionado);
       setPedidos(Array.isArray(res.data) ? res.data : []);
     } catch (err) {
