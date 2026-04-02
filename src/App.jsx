@@ -13,16 +13,17 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Profile from "./pages/Profile";
 import ForgotPassword from "./pages/ForgotPassword";
-import Home from "./pages/Home";
-import AdminDashboard from "./pages/AdminDashboard";
+// Importamos los nuevos componentes
+import Menu from "./components/Menu";
+import MisPedidos from "./components/MisPedidos";
 import Checkout from "./components/Checkout";
+import AdminDashboard from "./pages/AdminDashboard";
 
 // --- COMPONENTE PARA EL MENÚ INFERIOR ---
-// Lo creamos aparte para que useContext funcione correctamente
 const BarraNavegacionInferior = () => {
   const { user } = useContext(AuthContext);
 
-  // Solo lo mostramos si hay usuario y NO es admin
+  // Solo se muestra si el usuario está logueado y es un CLIENTE
   if (!user || user.rol === "admin") return null;
 
   return (
@@ -54,7 +55,7 @@ const BarraNavegacionInferior = () => {
   );
 };
 
-// --- COMPONENTE DE PROTECCIÓN ADMIN ---
+// --- PROTECCIÓN DE RUTAS ---
 const AdminRoute = ({ children }) => {
   const { user, loading } = useContext(AuthContext);
   if (loading)
@@ -67,7 +68,6 @@ const AdminRoute = ({ children }) => {
   return children;
 };
 
-// --- COMPONENTE DE PROTECCIÓN CLIENTE ---
 const ClienteRoute = ({ children }) => {
   const { user, loading } = useContext(AuthContext);
   if (loading)
@@ -76,7 +76,8 @@ const ClienteRoute = ({ children }) => {
         Cargando...
       </div>
     );
-  if (!user || user.rol === "admin") return <Navigate to="/login" />;
+  if (!user) return <Navigate to="/login" />; // Si no hay usuario, al login
+  if (user.rol === "admin") return <Navigate to="/admin" />; // Si es admin, al dashboard
   return children;
 };
 
@@ -86,33 +87,59 @@ function App() {
       <Router>
         <Navbar />
 
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/perfil" element={<Profile />} />
-          <Route path="/forgot-password" element={<ForgotPassword />} />
+        <div className="pb-20">
+          {" "}
+          {/* Espacio para que el menú inferior no tape el contenido */}
+          <Routes>
+            {/* 🏠 AHORA LA RAÍZ MUESTRA EL MENÚ DIRECTAMENTE */}
+            <Route path="/" element={<Menu />} />
 
-          <Route
-            path="/checkout"
-            element={
-              <ClienteRoute>
-                <Checkout />
-              </ClienteRoute>
-            }
-          />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
 
-          <Route
-            path="/admin"
-            element={
-              <AdminRoute>
-                <AdminDashboard />
-              </AdminRoute>
-            }
-          />
-        </Routes>
+            {/* 🛒 RUTA DEL CARRITO */}
+            <Route
+              path="/checkout"
+              element={
+                <ClienteRoute>
+                  <Checkout />
+                </ClienteRoute>
+              }
+            />
 
-        {/* 🔥 Llamamos al componente del menú aquí abajo */}
+            {/* 📋 RUTA DE MIS PEDIDOS */}
+            <Route
+              path="/mis-pedidos"
+              element={
+                <ClienteRoute>
+                  <MisPedidos />
+                </ClienteRoute>
+              }
+            />
+
+            {/* 👤 PERFIL (Solo clientes) */}
+            <Route
+              path="/perfil"
+              element={
+                <ClienteRoute>
+                  <Profile />
+                </ClienteRoute>
+              }
+            />
+
+            {/* ⚙️ PANEL DE ADMINISTRADOR */}
+            <Route
+              path="/admin"
+              element={
+                <AdminRoute>
+                  <AdminDashboard />
+                </AdminRoute>
+              }
+            />
+          </Routes>
+        </div>
+
         <BarraNavegacionInferior />
       </Router>
     </AuthProvider>
