@@ -54,9 +54,14 @@ const Menu = () => {
             className="bg-white rounded-3xl shadow-lg overflow-hidden border border-slate-100"
           >
             <img
-              src={`${BACKEND_URL}/uploads/${item.imagen}`}
+              /* 🔥 CORRECCIÓN AQUÍ: Usamos imagenUrl y quitamos /uploads/ manual */
+              src={`${BACKEND_URL}${item.imagenUrl}`}
               className="h-48 w-full object-cover"
               alt={item.nombre}
+              onError={(e) => {
+                e.target.src =
+                  "https://via.placeholder.com/400x300?text=Sin+Imagen";
+              }}
             />
             <div className="p-5 text-center">
               <span className="text-[10px] bg-orange-100 text-orange-600 px-3 py-1 rounded-full font-black uppercase">
