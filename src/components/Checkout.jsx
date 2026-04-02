@@ -11,7 +11,11 @@ const Checkout = () => {
   );
   const [mostrarFormulario, setMostrarFormulario] = useState(false);
 
-  // --- FUNCIÓN PARA ELIMINAR DEL CARRITO ---
+  // --- 1. LÓGICA DE VALIDACIÓN (MÍNIMO 3) ---
+  const totalUnidades = carrito.reduce((acc, item) => acc + item.cantidad, 0);
+  const faltanLeños = totalUnidades < 3;
+
+  // --- 2. FUNCIÓN PARA ELIMINAR ---
   const eliminarDelCarrito = (id) => {
     const nuevoCarrito = carrito.filter((item) => item._id !== id);
     setCarrito(nuevoCarrito);
@@ -35,6 +39,13 @@ const Checkout = () => {
 
   const enviarPedido = async (e) => {
     e.preventDefault();
+
+    // Seguridad extra por si intentan saltarse el botón bloqueado
+    if (totalUnidades < 3) {
+      alert("Lo sentimos, el pedido mínimo es de 3 leños.");
+      return;
+    }
+
     const pedido = {
       nombre: datosEnvio.nombre,
       telefono: datosEnvio.telefono,
@@ -80,10 +91,12 @@ const Checkout = () => {
   return (
     <div className="min-h-screen bg-slate-50 pb-24 p-4">
       {!mostrarFormulario ? (
+        /* VISTA 1: RESUMEN CON RESTRICCIÓN */
         <div className="max-w-md mx-auto bg-white rounded-3xl shadow-xl p-6 border border-slate-100">
           <h2 className="text-2xl font-black uppercase italic mb-6 border-b-4 border-orange-500 inline-block">
             Tu Carrito
           </h2>
+
           <div className="space-y-4 mb-8">
             {carrito.map((item) => (
               <div
@@ -102,8 +115,6 @@ const Checkout = () => {
                   <p className="font-black text-sm">
                     ${item.cantidad * item.precio}
                   </p>
-
-                  {/* BOTÓN ELIMINAR */}
                   <button
                     onClick={() => eliminarDelCarrito(item._id)}
                     className="text-red-500 bg-red-50 p-2 rounded-xl active:scale-90 transition-all"
@@ -127,10 +138,22 @@ const Checkout = () => {
               </div>
             ))}
           </div>
+
+          {/* MENSAJE DE ADVERTENCIA SI FALTAN LEÑOS */}
+          {faltanLeños && (
+            <div className="bg-orange-50 border-2 border-orange-200 p-4 rounded-2xl mb-6 text-center">
+              <p className="text-orange-600 font-black text-[10px] uppercase italic leading-tight">
+                ⚠️ Pedido mínimo: 3 leños <br /> ¡Agrega {3 - totalUnidades} más
+                para continuar!
+              </p>
+            </div>
+          )}
+
           <div className="flex justify-between items-center text-xl font-black p-4 bg-slate-900 text-white rounded-2xl mb-6">
             <span>TOTAL:</span>
             <span>${total}</span>
           </div>
+
           <div className="grid grid-cols-2 gap-3">
             <button
               onClick={() => navigate("/")}
@@ -139,14 +162,20 @@ const Checkout = () => {
               Añadir más
             </button>
             <button
+              disabled={faltanLeños}
               onClick={() => setMostrarFormulario(true)}
-              className="bg-orange-500 text-white py-4 rounded-2xl font-black uppercase text-xs shadow-lg shadow-orange-200"
+              className={`py-4 rounded-2xl font-black uppercase text-xs shadow-lg transition-all ${
+                faltanLeños
+                  ? "bg-slate-300 text-slate-500 cursor-not-allowed shadow-none"
+                  : "bg-orange-500 text-white shadow-orange-200 active:scale-95"
+              }`}
             >
-              Confirmar
+              {faltanLeños ? `Faltan ${3 - totalUnidades}` : "Confirmar"}
             </button>
           </div>
         </div>
       ) : (
+        /* VISTA 2: FORMULARIO */
         <div className="max-w-md mx-auto bg-white rounded-3xl shadow-xl p-6">
           <h2 className="text-xl font-black mb-6 italic uppercase text-orange-600">
             Datos de Entrega
@@ -193,7 +222,7 @@ const Checkout = () => {
             />
             <input
               className="w-full bg-slate-50 border-none p-4 rounded-2xl text-sm font-bold"
-              placeholder="Referencia (casa azul, frente a...)"
+              placeholder="Referencia"
               value={datosEnvio.referencia}
               onChange={(e) =>
                 setDatosEnvio({ ...datosEnvio, referencia: e.target.value })
