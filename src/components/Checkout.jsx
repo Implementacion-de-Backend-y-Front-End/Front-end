@@ -11,16 +11,9 @@ const Checkout = () => {
   );
   const [mostrarFormulario, setMostrarFormulario] = useState(false);
 
-  // --- 1. LÓGICA DE VALIDACIÓN (MÍNIMO 3) ---
-  const totalUnidades = carrito.reduce((acc, item) => acc + item.cantidad, 0);
-  const faltanLeños = totalUnidades < 3;
-
-  // --- 2. FUNCIÓN PARA ELIMINAR ---
-  const eliminarDelCarrito = (id) => {
-    const nuevoCarrito = carrito.filter((item) => item._id !== id);
-    setCarrito(nuevoCarrito);
-    localStorage.setItem("carrito", JSON.stringify(nuevoCarrito));
-  };
+  // --- ESTADO PARA FECHA Y HORA ---
+  const [fecha, setFecha] = useState(new Date().toISOString().split("T")[0]); // Hoy por defecto
+  const [hora, setHora] = useState("09:00"); // Hora sugerida
 
   const [datosEnvio, setDatosEnvio] = useState({
     nombre: user?.nombre || "",
@@ -29,9 +22,23 @@ const Checkout = () => {
     colonia: "",
     referencia: "",
     tipoEntrega: "Hoy",
-    fechaEntrega: new Date().toISOString(),
   });
 
+  const actualizarCantidad = (id, accion) => {
+    const nuevoCarrito = carrito.map((item) => {
+      if (item._id === id) {
+        const nuevaCantidad =
+          accion === "sumar" ? item.cantidad + 1 : item.cantidad - 1;
+        return { ...item, cantidad: nuevaCantidad > 0 ? nuevaCantidad : 1 };
+      }
+      return item;
+    });
+    setCarrito(nuevoCarrito);
+    localStorage.setItem("carrito", JSON.stringify(nuevoCarrito));
+  };
+
+  const totalUnidades = carrito.reduce((acc, item) => acc + item.cantidad, 0);
+  const faltanLeños = totalUnidades < 3;
   const total = carrito.reduce(
     (acc, item) => acc + item.precio * item.cantidad,
     0,
@@ -40,9 +47,12 @@ const Checkout = () => {
   const enviarPedido = async (e) => {
     e.preventDefault();
 
-    // Seguridad extra por si intentan saltarse el botón bloqueado
-    if (totalUnidades < 3) {
-      alert("Lo sentimos, el pedido mínimo es de 3 leños.");
+    // Validar Horario de Doña María (7 AM a 2 PM)
+    const horaNum = parseInt(hora.split(":")[0]);
+    if (horaNum < 7 || horaNum >= 14) {
+      alert(
+        "🕒 El horario de entrega es de 7:00 AM a 2:00 PM. Por favor ajusta la hora.",
+      );
       return;
     }
 
@@ -57,27 +67,25 @@ const Checkout = () => {
         subtotal: item.precio * item.cantidad,
       })),
       total: total,
-      fechaEntrega: datosEnvio.fechaEntrega,
+      // Unimos fecha y hora para el backend
+      fechaEntrega: `${fecha}T${hora}:00`,
       tipoEntrega: datosEnvio.tipoEntrega,
       direccion: {
         calle: datosEnvio.calle,
         colonia: datosEnvio.colonia,
         referencia: datosEnvio.referencia,
       },
-      nota: `Pedido realizado por app - Entrega: ${datosEnvio.tipoEntrega}`,
+      nota: `Pedido para el ${fecha} a las ${hora}`,
     };
 
     try {
       const res = await clienteAxios.post("/api/orders", pedido);
       alert(res.data.message);
-      if (res.data.whatsappLink) {
-        window.open(res.data.whatsappLink, "_blank");
-      }
+      if (res.data.whatsappLink) window.open(res.data.whatsappLink, "_blank");
       localStorage.removeItem("carrito");
       navigate("/mis-pedidos");
     } catch (error) {
-      console.error(error);
-      alert(error.response?.data?.message || "Error al procesar el pedido");
+      alert(error.response?.data?.message || "Error al procesar pedido");
     }
   };
 
@@ -89,121 +97,108 @@ const Checkout = () => {
     );
 
   return (
-    <div className="min-h-screen bg-slate-50 pb-24 p-4">
+    <div className="min-h-screen bg-slate-50 pb-24 p-4 font-sans">
       {!mostrarFormulario ? (
-        /* VISTA 1: RESUMEN CON RESTRICCIÓN */
+        /* VISTA 1: CARRITO (Ya la tienes bien) */
         <div className="max-w-md mx-auto bg-white rounded-3xl shadow-xl p-6 border border-slate-100">
           <h2 className="text-2xl font-black uppercase italic mb-6 border-b-4 border-orange-500 inline-block">
             Tu Carrito
           </h2>
-
           <div className="space-y-4 mb-8">
             {carrito.map((item) => (
               <div
                 key={item._id}
-                className="flex justify-between items-center bg-slate-50 p-3 rounded-2xl"
+                className="bg-slate-50 p-4 rounded-3xl flex flex-col gap-2"
               >
-                <div className="flex-1">
-                  <p className="font-black text-slate-800 uppercase text-sm">
-                    {item.nombre}
-                  </p>
-                  <p className="text-xs font-bold text-orange-600">
-                    {item.cantidad} x ${item.precio}
-                  </p>
-                </div>
-                <div className="flex items-center gap-4">
-                  <p className="font-black text-sm">
-                    ${item.cantidad * item.precio}
-                  </p>
+                <div className="flex justify-between font-black text-sm uppercase">
+                  <span>{item.nombre}</span>
                   <button
-                    onClick={() => eliminarDelCarrito(item._id)}
-                    className="text-red-500 bg-red-50 p-2 rounded-xl active:scale-90 transition-all"
+                    onClick={() =>
+                      setCarrito(carrito.filter((i) => i._id !== item._id))
+                    }
+                    className="text-red-400 text-xs"
                   >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-4 w-4"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={3}
-                        d="M6 18L18 6M6 6l12 12"
-                      />
-                    </svg>
+                    Quitar
                   </button>
+                </div>
+                <div className="flex justify-between items-center">
+                  <div className="flex items-center bg-orange-100 rounded-xl px-3 py-1 gap-4">
+                    <button
+                      onClick={() => actualizarCantidad(item._id, "restar")}
+                      className="font-black text-orange-600"
+                    >
+                      −
+                    </button>
+                    <span className="font-black text-sm">{item.cantidad}</span>
+                    <button
+                      onClick={() => actualizarCantidad(item._id, "sumar")}
+                      className="font-black text-orange-600"
+                    >
+                      +
+                    </button>
+                  </div>
+                  <span className="font-black text-slate-700">
+                    ${item.cantidad * item.precio}
+                  </span>
                 </div>
               </div>
             ))}
           </div>
-
-          {/* MENSAJE DE ADVERTENCIA SI FALTAN LEÑOS */}
-          {faltanLeños && (
-            <div className="bg-orange-50 border-2 border-orange-200 p-4 rounded-2xl mb-6 text-center">
-              <p className="text-orange-600 font-black text-[10px] uppercase italic leading-tight">
-                ⚠️ Pedido mínimo: 3 leños <br /> ¡Agrega {3 - totalUnidades} más
-                para continuar!
-              </p>
-            </div>
-          )}
-
-          <div className="flex justify-between items-center text-xl font-black p-4 bg-slate-900 text-white rounded-2xl mb-6">
+          <div className="bg-slate-900 text-white p-4 rounded-2xl flex justify-between font-black mb-6">
             <span>TOTAL:</span>
             <span>${total}</span>
           </div>
-
-          <div className="grid grid-cols-2 gap-3">
-            <button
-              onClick={() => navigate("/")}
-              className="bg-slate-200 py-4 rounded-2xl font-black uppercase text-xs"
-            >
-              Añadir más
-            </button>
-            <button
-              disabled={faltanLeños}
-              onClick={() => setMostrarFormulario(true)}
-              className={`py-4 rounded-2xl font-black uppercase text-xs shadow-lg transition-all ${
-                faltanLeños
-                  ? "bg-slate-300 text-slate-500 cursor-not-allowed shadow-none"
-                  : "bg-orange-500 text-white shadow-orange-200 active:scale-95"
-              }`}
-            >
-              {faltanLeños ? `Faltan ${3 - totalUnidades}` : "Confirmar"}
-            </button>
-          </div>
+          <button
+            disabled={faltanLeños}
+            onClick={() => setMostrarFormulario(true)}
+            className={`w-full py-4 rounded-2xl font-black uppercase text-xs ${faltanLeños ? "bg-slate-200 text-slate-400" : "bg-orange-500 text-white shadow-lg shadow-orange-200"}`}
+          >
+            {faltanLeños
+              ? `Faltan ${3 - totalUnidades} leños`
+              : "Continuar a Entrega"}
+          </button>
         </div>
       ) : (
-        /* VISTA 2: FORMULARIO */
-        <div className="max-w-md mx-auto bg-white rounded-3xl shadow-xl p-6">
-          <h2 className="text-xl font-black mb-6 italic uppercase text-orange-600">
-            Datos de Entrega
+        /* VISTA 2: FORMULARIO CON FECHA Y HORA */
+        <div className="max-w-md mx-auto bg-white rounded-3xl shadow-xl p-6 border border-slate-100">
+          <h2 className="text-xl font-black mb-6 italic uppercase text-orange-600 text-center">
+            Agenda tu Entrega
           </h2>
+
           <form onSubmit={enviarPedido} className="space-y-4">
-            <div className="bg-slate-100 p-1 rounded-2xl flex">
-              <button
-                type="button"
-                onClick={() =>
-                  setDatosEnvio({ ...datosEnvio, tipoEntrega: "Hoy" })
-                }
-                className={`flex-1 py-3 rounded-xl font-black text-xs uppercase ${datosEnvio.tipoEntrega === "Hoy" ? "bg-orange-500 text-white shadow-md" : "text-slate-400"}`}
-              >
-                🕒 Hoy
-              </button>
-              <button
-                type="button"
-                onClick={() =>
-                  setDatosEnvio({ ...datosEnvio, tipoEntrega: "Programar" })
-                }
-                className={`flex-1 py-3 rounded-xl font-black text-xs uppercase ${datosEnvio.tipoEntrega === "Programar" ? "bg-orange-500 text-white shadow-md" : "text-slate-400"}`}
-              >
-                📅 Programar
-              </button>
+            {/* SELECTOR DE FECHA */}
+            <div>
+              <label className="text-[10px] font-black uppercase text-slate-400 ml-2">
+                ¿Qué día quieres tus leños?
+              </label>
+              <input
+                type="date"
+                min={new Date().toISOString().split("T")[0]}
+                className="w-full bg-slate-50 p-4 rounded-2xl text-sm font-bold border-none"
+                value={fecha}
+                onChange={(e) => setFecha(e.target.value)}
+                required
+              />
             </div>
 
+            {/* SELECTOR DE HORA (Limitado por lógica en enviarPedido) */}
+            <div>
+              <label className="text-[10px] font-black uppercase text-slate-400 ml-2">
+                ¿A qué hora? (7 AM - 2 PM)
+              </label>
+              <input
+                type="time"
+                className="w-full bg-slate-50 p-4 rounded-2xl text-sm font-bold border-none"
+                value={hora}
+                onChange={(e) => setHora(e.target.value)}
+                required
+              />
+            </div>
+
+            <hr className="border-slate-100 my-2" />
+
             <input
-              className="w-full bg-slate-50 border-none p-4 rounded-2xl text-sm font-bold"
+              className="w-full bg-slate-50 p-4 rounded-2xl text-sm font-bold border-none"
               placeholder="Calle y Número"
               value={datosEnvio.calle}
               onChange={(e) =>
@@ -212,7 +207,7 @@ const Checkout = () => {
               required
             />
             <input
-              className="w-full bg-slate-50 border-none p-4 rounded-2xl text-sm font-bold"
+              className="w-full bg-slate-50 p-4 rounded-2xl text-sm font-bold border-none"
               placeholder="Colonia"
               value={datosEnvio.colonia}
               onChange={(e) =>
@@ -221,7 +216,7 @@ const Checkout = () => {
               required
             />
             <input
-              className="w-full bg-slate-50 border-none p-4 rounded-2xl text-sm font-bold"
+              className="w-full bg-slate-50 p-4 rounded-2xl text-sm font-bold border-none"
               placeholder="Referencia"
               value={datosEnvio.referencia}
               onChange={(e) =>
@@ -229,7 +224,7 @@ const Checkout = () => {
               }
             />
             <input
-              className="w-full bg-slate-50 border-none p-4 rounded-2xl text-sm font-bold"
+              className="w-full bg-slate-50 p-4 rounded-2xl text-sm font-bold border-none"
               placeholder="Teléfono"
               value={datosEnvio.telefono}
               onChange={(e) =>
@@ -240,16 +235,16 @@ const Checkout = () => {
 
             <button
               type="submit"
-              className="w-full bg-slate-900 text-white py-5 rounded-2xl font-black uppercase tracking-widest shadow-xl active:scale-95 transition-all"
+              className="w-full bg-slate-900 text-white py-5 rounded-2xl font-black uppercase tracking-widest shadow-xl active:scale-95 transition-all mt-4"
             >
-              PEDIR MIS LEÑOS 🔥
+              FINALIZAR PEDIDO 🔥
             </button>
             <button
               type="button"
               onClick={() => setMostrarFormulario(false)}
-              className="w-full text-slate-400 font-bold text-xs uppercase"
+              className="w-full text-slate-400 font-bold text-[10px] uppercase pt-2"
             >
-              Cancelar
+              Volver al carrito
             </button>
           </form>
         </div>
