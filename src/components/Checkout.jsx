@@ -189,7 +189,7 @@ const Checkout = () => {
                       setDatosEnvio({
                         ...datosEnvio,
                         tipoEntrega: "Hoy",
-                        fechaEntrega: new Date().toISOString().split("T")[0],
+                        fechaEntrega: new Date().toISOString(),
                       })
                     }
                     className={`flex-1 py-3 rounded-xl font-black text-xs uppercase transition-all ${datosEnvio.tipoEntrega === "Hoy" ? "bg-orange-500 text-white shadow-md" : "text-slate-400"}`}
