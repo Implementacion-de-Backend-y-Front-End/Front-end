@@ -67,30 +67,31 @@ const RepartidorDashboard = () => {
     }
   };
 
-  // Confirmar entrega
+  // Confirmar entrega - Envía WhatsApp a cliente Y admins
   const handleEntregado = async (pedidoId) => {
     if (!window.confirm("¿Confirmas que ya entregaste este pedido?")) return;
 
     try {
       const res = await clienteAxios.put(`/api/delivery/entregar/${pedidoId}`);
 
-      // Abrir WhatsApp del cliente
+      // Primero abrir WhatsApp del cliente
       if (res.data.whatsappCliente) {
         window.open(res.data.whatsappCliente, "_blank");
       }
 
-      // Abrir WhatsApp de los admins (después de 1 segundo para no bloquear popups)
+      // Luego abrir WhatsApp de cada admin (con delay para evitar bloqueo de popups)
       if (res.data.whatsappAdmins && res.data.whatsappAdmins.length > 0) {
-        setTimeout(() => {
-          res.data.whatsappAdmins.forEach((admin, index) => {
-            setTimeout(() => {
+        res.data.whatsappAdmins.forEach((admin, index) => {
+          setTimeout(
+            () => {
               window.open(admin.url, "_blank");
-            }, index * 500); // Espaciar 500ms entre cada uno
-          });
-        }, 1000);
+            },
+            (index + 1) * 1500,
+          ); // 1.5 segundos entre cada uno
+        });
       }
 
-      alert("✅ ¡Pedido entregado con éxito!");
+      alert("✅ ¡Pedido entregado! Se notificó al cliente y al administrador.");
       setPedidoActivo(null);
       setVista("rutas");
       fetchRutas();
