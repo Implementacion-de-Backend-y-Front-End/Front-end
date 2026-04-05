@@ -1,19 +1,24 @@
-import { useState, useContext, useEffect } from "react";
+// src/components/Checkout.jsx
+import { useState, useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
 import clienteAxios from "../api/axios";
 import { useNavigate } from "react-router-dom";
+import { X, CheckCircle } from "lucide-react";
 
 const Checkout = () => {
   const { user } = useContext(AuthContext);
   const navigate = useNavigate();
+
   const [carrito, setCarrito] = useState(
     JSON.parse(localStorage.getItem("carrito")) || [],
   );
   const [mostrarFormulario, setMostrarFormulario] = useState(false);
+  const [mostrarTicket, setMostrarTicket] = useState(false);
+  const [ticketData, setTicketData] = useState(null);
 
-  // --- ESTADO PARA FECHA Y HORA ---
-  const [fecha, setFecha] = useState(new Date().toISOString().split("T")[0]); // Hoy por defecto
-  const [hora, setHora] = useState("09:00"); // Hora sugerida
+  // Estado para fecha y hora
+  const [fecha, setFecha] = useState(new Date().toISOString().split("T")[0]);
+  const [hora, setHora] = useState("09:00");
 
   const [datosEnvio, setDatosEnvio] = useState({
     nombre: user?.nombre || "",
@@ -37,6 +42,12 @@ const Checkout = () => {
     localStorage.setItem("carrito", JSON.stringify(nuevoCarrito));
   };
 
+  const eliminarDelCarrito = (id) => {
+    const nuevoCarrito = carrito.filter((i) => i._id !== id);
+    setCarrito(nuevoCarrito);
+    localStorage.setItem("carrito", JSON.stringify(nuevoCarrito));
+  };
+
   const totalUnidades = carrito.reduce((acc, item) => acc + item.cantidad, 0);
   const faltanLeños = totalUnidades < 3;
   const total = carrito.reduce(
@@ -47,7 +58,7 @@ const Checkout = () => {
   const enviarPedido = async (e) => {
     e.preventDefault();
 
-    // Validar Horario de Doña María (7 AM a 2 PM)
+    // Validar horario
     const horaNum = parseInt(hora.split(":")[0]);
     if (horaNum < 7 || horaNum >= 14) {
       alert(
@@ -67,7 +78,6 @@ const Checkout = () => {
         subtotal: item.precio * item.cantidad,
       })),
       total: total,
-      // Unimos fecha y hora para el backend
       fechaEntrega: `${fecha}T${hora}:00`,
       tipoEntrega: datosEnvio.tipoEntrega,
       direccion: {
@@ -80,30 +90,57 @@ const Checkout = () => {
 
     try {
       const res = await clienteAxios.post("/api/orders", pedido);
-      alert(res.data.message);
-      //if (res.data.whatsappLink) window.open(res.data.whatsappLink, "_blank");
+
+      // Guardar datos del ticket
+      setTicketData({
+        folio: res.data.pedido.folio,
+        productos: carrito,
+        total: total,
+        fecha: fecha,
+        hora: hora,
+        direccion: datosEnvio,
+      });
+
+      // Mostrar ticket
+      setMostrarTicket(true);
+
+      // Limpiar carrito
       localStorage.removeItem("carrito");
-      navigate("/mis-pedidos");
+      setCarrito([]);
     } catch (error) {
       alert(error.response?.data?.message || "Error al procesar pedido");
     }
   };
 
-  if (carrito.length === 0)
+  // Si el carrito está vacío y no hay ticket
+  if (carrito.length === 0 && !mostrarTicket) {
     return (
-      <div className="p-10 text-center font-black italic">
-        EL CARRITO ESTÁ VACÍO 🛒
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
+        <div className="text-center">
+          <div className="text-6xl mb-4">🛒</div>
+          <p className="font-black italic text-slate-400 uppercase">
+            El carrito está vacío
+          </p>
+          <button
+            onClick={() => navigate("/")}
+            className="mt-4 bg-orange-500 text-white px-6 py-3 rounded-xl font-bold text-sm"
+          >
+            Ver Menú
+          </button>
+        </div>
       </div>
     );
+  }
 
   return (
     <div className="min-h-screen bg-slate-50 pb-24 p-4 font-sans">
-      {!mostrarFormulario ? (
-        /* VISTA 1: CARRITO (Ya la tienes bien) */
+      {/* VISTA 1: CARRITO */}
+      {!mostrarFormulario && !mostrarTicket && (
         <div className="max-w-md mx-auto bg-white rounded-3xl shadow-xl p-6 border border-slate-100">
           <h2 className="text-2xl font-black uppercase italic mb-6 border-b-4 border-orange-500 inline-block">
             Tu Carrito
           </h2>
+
           <div className="space-y-4 mb-8">
             {carrito.map((item) => (
               <div
@@ -113,10 +150,8 @@ const Checkout = () => {
                 <div className="flex justify-between font-black text-sm uppercase">
                   <span>{item.nombre}</span>
                   <button
-                    onClick={() =>
-                      setCarrito(carrito.filter((i) => i._id !== item._id))
-                    }
-                    className="text-red-400 text-xs"
+                    onClick={() => eliminarDelCarrito(item._id)}
+                    className="text-red-400 text-xs hover:text-red-600"
                   >
                     Quitar
                   </button>
@@ -125,14 +160,14 @@ const Checkout = () => {
                   <div className="flex items-center bg-orange-100 rounded-xl px-3 py-1 gap-4">
                     <button
                       onClick={() => actualizarCantidad(item._id, "restar")}
-                      className="font-black text-orange-600"
+                      className="font-black text-orange-600 text-lg"
                     >
                       −
                     </button>
                     <span className="font-black text-sm">{item.cantidad}</span>
                     <button
                       onClick={() => actualizarCantidad(item._id, "sumar")}
-                      className="font-black text-orange-600"
+                      className="font-black text-orange-600 text-lg"
                     >
                       +
                     </button>
@@ -144,27 +179,35 @@ const Checkout = () => {
               </div>
             ))}
           </div>
+
           <div className="bg-slate-900 text-white p-4 rounded-2xl flex justify-between font-black mb-6">
             <span>TOTAL:</span>
             <span>${total}</span>
           </div>
+
           <button
             disabled={faltanLeños}
             onClick={() => setMostrarFormulario(true)}
-            className={`w-full py-4 rounded-2xl font-black uppercase text-xs ${faltanLeños ? "bg-slate-200 text-slate-400" : "bg-orange-500 text-white shadow-lg shadow-orange-200"}`}
+            className={`w-full py-4 rounded-2xl font-black uppercase text-xs transition-all ${
+              faltanLeños
+                ? "bg-slate-200 text-slate-400"
+                : "bg-orange-500 text-white shadow-lg shadow-orange-200 hover:bg-orange-600"
+            }`}
           >
             {faltanLeños ? `Faltan ${3 - totalUnidades} leños` : "Pedir"}
           </button>
         </div>
-      ) : (
-        /* VISTA 2: FORMULARIO CON FECHA Y HORA */
+      )}
+
+      {/* VISTA 2: FORMULARIO */}
+      {mostrarFormulario && !mostrarTicket && (
         <div className="max-w-md mx-auto bg-white rounded-3xl shadow-xl p-6 border border-slate-100">
           <h2 className="text-xl font-black mb-6 italic uppercase text-orange-600 text-center">
             Agenda tu Entrega
           </h2>
 
           <form onSubmit={enviarPedido} className="space-y-4">
-            {/* SELECTOR DE FECHA */}
+            {/* Selector de fecha */}
             <div>
               <label className="text-[10px] font-black uppercase text-slate-400 ml-2">
                 ¿Qué día quieres tus leños?
@@ -172,21 +215,21 @@ const Checkout = () => {
               <input
                 type="date"
                 min={new Date().toISOString().split("T")[0]}
-                className="w-full bg-slate-50 p-4 rounded-2xl text-sm font-bold border-none"
+                className="w-full bg-slate-50 p-4 rounded-2xl text-sm font-bold border-none focus:ring-2 focus:ring-orange-500"
                 value={fecha}
                 onChange={(e) => setFecha(e.target.value)}
                 required
               />
             </div>
 
-            {/* SELECTOR DE HORA (Limitado por lógica en enviarPedido) */}
+            {/* Selector de hora */}
             <div>
               <label className="text-[10px] font-black uppercase text-slate-400 ml-2">
                 ¿A qué hora? (7 AM - 2 PM)
               </label>
               <input
                 type="time"
-                className="w-full bg-slate-50 p-4 rounded-2xl text-sm font-bold border-none"
+                className="w-full bg-slate-50 p-4 rounded-2xl text-sm font-bold border-none focus:ring-2 focus:ring-orange-500"
                 value={hora}
                 onChange={(e) => setHora(e.target.value)}
                 required
@@ -196,7 +239,7 @@ const Checkout = () => {
             <hr className="border-slate-100 my-2" />
 
             <input
-              className="w-full bg-slate-50 p-4 rounded-2xl text-sm font-bold border-none"
+              className="w-full bg-slate-50 p-4 rounded-2xl text-sm font-bold border-none focus:ring-2 focus:ring-orange-500"
               placeholder="Calle y Número"
               value={datosEnvio.calle}
               onChange={(e) =>
@@ -204,8 +247,9 @@ const Checkout = () => {
               }
               required
             />
+
             <input
-              className="w-full bg-slate-50 p-4 rounded-2xl text-sm font-bold border-none"
+              className="w-full bg-slate-50 p-4 rounded-2xl text-sm font-bold border-none focus:ring-2 focus:ring-orange-500"
               placeholder="Colonia"
               value={datosEnvio.colonia}
               onChange={(e) =>
@@ -213,16 +257,18 @@ const Checkout = () => {
               }
               required
             />
+
             <input
-              className="w-full bg-slate-50 p-4 rounded-2xl text-sm font-bold border-none"
-              placeholder="Referencia"
+              className="w-full bg-slate-50 p-4 rounded-2xl text-sm font-bold border-none focus:ring-2 focus:ring-orange-500"
+              placeholder="Referencia (ej: casa azul, portón negro)"
               value={datosEnvio.referencia}
               onChange={(e) =>
                 setDatosEnvio({ ...datosEnvio, referencia: e.target.value })
               }
             />
+
             <input
-              className="w-full bg-slate-50 p-4 rounded-2xl text-sm font-bold border-none"
+              className="w-full bg-slate-50 p-4 rounded-2xl text-sm font-bold border-none focus:ring-2 focus:ring-orange-500"
               placeholder="Teléfono"
               value={datosEnvio.telefono}
               onChange={(e) =>
@@ -231,20 +277,152 @@ const Checkout = () => {
               required
             />
 
+            {/* Resumen del pedido */}
+            <div className="bg-slate-900 text-white p-4 rounded-2xl">
+              <div className="flex justify-between text-sm mb-2">
+                <span className="text-slate-400">Productos:</span>
+                <span>{totalUnidades} leños</span>
+              </div>
+              <div className="flex justify-between font-black text-lg">
+                <span>TOTAL:</span>
+                <span>${total}.00</span>
+              </div>
+            </div>
+
             <button
               type="submit"
-              className="w-full bg-slate-900 text-white py-5 rounded-2xl font-black uppercase tracking-widest shadow-xl active:scale-95 transition-all mt-4"
+              className="w-full bg-slate-900 text-white py-5 rounded-2xl font-black uppercase tracking-widest shadow-xl active:scale-95 transition-all mt-4 hover:bg-slate-800"
             >
               FINALIZAR PEDIDO 🔥
             </button>
+
             <button
               type="button"
               onClick={() => setMostrarFormulario(false)}
-              className="w-full text-slate-400 font-bold text-[10px] uppercase pt-2"
+              className="w-full text-slate-400 font-bold text-[10px] uppercase pt-2 hover:text-slate-600"
             >
-              Volver al carrito
+              ← Volver al carrito
             </button>
           </form>
+        </div>
+      )}
+
+      {/* MODAL DE TICKET */}
+      {mostrarTicket && ticketData && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl relative animate-in zoom-in duration-300">
+            {/* Botón cerrar */}
+            <button
+              onClick={() => {
+                setMostrarTicket(false);
+                navigate("/mis-pedidos");
+              }}
+              className="absolute top-4 right-4 text-slate-400 hover:text-slate-600"
+            >
+              <X size={20} />
+            </button>
+
+            {/* Encabezado del ticket */}
+            <div className="text-center border-b-2 border-dashed border-slate-200 pb-4 mb-4">
+              <h2 className="text-2xl font-black text-slate-900">
+                🔥 LEÑOS RELLENOS
+              </h2>
+              <p className="text-xs text-slate-400 uppercase tracking-widest">
+                Ticket de Pedido
+              </p>
+            </div>
+
+            {/* Icono de éxito */}
+            <div className="flex justify-center mb-4">
+              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
+                <CheckCircle size={32} className="text-green-500" />
+              </div>
+            </div>
+
+            <p className="text-center text-green-600 font-bold mb-4">
+              ¡Pedido recibido con éxito!
+            </p>
+
+            {/* Folio destacado */}
+            <div className="bg-orange-500 text-white text-center py-4 rounded-2xl mb-4">
+              <p className="text-xs uppercase tracking-widest opacity-80">
+                Tu Folio
+              </p>
+              <p className="text-3xl font-black">{ticketData.folio}</p>
+            </div>
+
+            {/* Productos */}
+            <div className="space-y-2 border-b border-dashed border-slate-200 pb-4 mb-4">
+              <p className="text-[10px] text-slate-400 uppercase font-bold">
+                Detalle:
+              </p>
+              {ticketData.productos.map((item, idx) => (
+                <div key={idx} className="flex justify-between text-sm">
+                  <span className="text-slate-600">
+                    {item.nombre} x{item.cantidad}
+                  </span>
+                  <span className="font-bold">
+                    ${item.precio * item.cantidad}
+                  </span>
+                </div>
+              ))}
+            </div>
+
+            {/* Total */}
+            <div className="flex justify-between items-center mb-4">
+              <span className="text-slate-500 font-bold">TOTAL:</span>
+              <span className="text-2xl font-black text-slate-900">
+                ${ticketData.total}.00
+              </span>
+            </div>
+
+            {/* Fecha y hora de entrega */}
+            <div className="bg-slate-100 p-3 rounded-xl text-center mb-4">
+              <p className="text-xs text-slate-400 uppercase">
+                Entrega programada
+              </p>
+              <p className="font-bold text-slate-700">
+                {new Date(ticketData.fecha).toLocaleDateString("es-MX", {
+                  weekday: "long",
+                  day: "numeric",
+                  month: "long",
+                })}{" "}
+                a las {ticketData.hora}
+              </p>
+            </div>
+
+            {/* Dirección */}
+            <div className="bg-slate-50 p-3 rounded-xl mb-4">
+              <p className="text-xs text-slate-400 uppercase mb-1">
+                Dirección de entrega
+              </p>
+              <p className="text-sm font-medium text-slate-700">
+                {ticketData.direccion.calle}, {ticketData.direccion.colonia}
+              </p>
+              {ticketData.direccion.referencia && (
+                <p className="text-xs text-slate-500 italic">
+                  Ref: {ticketData.direccion.referencia}
+                </p>
+              )}
+            </div>
+
+            {/* Mensaje */}
+            <div className="text-center text-xs text-slate-400 mb-4">
+              <p>¡Gracias por tu pedido!</p>
+              <p>Te notificaremos por WhatsApp cuando esté confirmado.</p>
+            </div>
+
+            {/* Botón */}
+            <button
+              onClick={() => {
+                setMostrarTicket(false);
+                navigate("/mis-pedidos");
+              }}
+              className="w-full bg-slate-900 text-white py-4 rounded-2xl font-black uppercase text-xs hover:bg-slate-800 transition-all"
+            >
+              Ver Mis Pedidos
+            </button>
+          </div>
         </div>
       )}
     </div>
