@@ -23,7 +23,6 @@ const UsuariosManager = () => {
   const [loading, setLoading] = useState(false);
   const [refresh, setRefresh] = useState(0);
 
-  // Referencia para bajar a la lista
   const listaRef = useRef(null);
 
   const scrollToUsuarios = () => {
@@ -38,7 +37,8 @@ const UsuariosManager = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      await clienteAxios.post("/users/register", formData);
+      // ✅ CORREGIDO: Usar la ruta protegida para registrar staff
+      await clienteAxios.post("/api/users/registrar-staff", formData);
       alert(`¡${formData.rol.toUpperCase()} registrado con éxito! 🔥`);
       setFormData({
         nombre: "",
@@ -147,12 +147,12 @@ const UsuariosManager = () => {
         </form>
       </section>
 
-      {/* SECCIÓN 2: Lista de Usuarios (Debajo) */}
+      {/* SECCIÓN 2: Lista de Usuarios */}
       <div ref={listaRef} className="max-w-4xl mx-auto">
         <PersonalList reload={refresh} />
       </div>
 
-      {/* BOTÓN FLOTANTE (FAB) */}
+      {/* BOTÓN FLOTANTE */}
       <button
         onClick={scrollToUsuarios}
         className="fixed bottom-8 right-8 bg-orange-600 text-white px-6 py-4 rounded-full shadow-2xl shadow-orange-900/40 font-black uppercase italic text-xs flex items-center gap-3 hover:bg-orange-500 transition-all hover:-translate-y-2 active:scale-95 z-50 border-2 border-orange-400/20"

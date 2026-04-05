@@ -6,12 +6,11 @@ const PersonalList = ({ reload }) => {
   const [personal, setPersonal] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Función para obtener solo admin y repartidores
   const fetchPersonal = async () => {
     try {
       setLoading(true);
-      // Ruta que filtra roles de staff en el backend
-      const res = await clienteAxios.get("/users/personal");
+      // ✅ CORREGIDO: Agregar /api al inicio
+      const res = await clienteAxios.get("/api/users/personal");
       setPersonal(res.data);
     } catch (error) {
       console.error("Error al cargar personal:", error);
@@ -31,7 +30,8 @@ const PersonalList = ({ reload }) => {
     if (!confirmar) return;
 
     try {
-      await clienteAxios.delete(`/users/${id}`);
+      // ✅ CORREGIDO: Agregar /api al inicio
+      await clienteAxios.delete(`/api/users/${id}`);
       alert("Miembro del equipo eliminado 🪵");
       fetchPersonal();
     } catch (error) {
@@ -42,7 +42,6 @@ const PersonalList = ({ reload }) => {
 
   return (
     <div className="bg-[#1e293b] p-8 rounded-3xl border border-slate-800 shadow-2xl w-full animate-in fade-in slide-in-from-top-4 duration-700">
-      {/* Encabezado de la lista */}
       <div className="flex flex-col md:flex-row items-center justify-between mb-8 gap-4">
         <div>
           <h2 className="text-2xl font-black uppercase italic text-white tracking-tighter">
@@ -53,7 +52,6 @@ const PersonalList = ({ reload }) => {
           </p>
         </div>
 
-        {/* Contador de personal */}
         <div className="bg-[#0f172a] px-6 py-2 rounded-2xl border border-slate-800 flex items-center gap-3">
           <div className="flex -space-x-2">
             <div className="w-6 h-6 rounded-full bg-orange-600 border-2 border-[#0f172a]"></div>
@@ -65,7 +63,6 @@ const PersonalList = ({ reload }) => {
         </div>
       </div>
 
-      {/* Contenedor de Tarjetas */}
       <div className="space-y-4">
         {loading ? (
           <div className="flex flex-col items-center justify-center py-24 text-slate-500">
@@ -88,7 +85,6 @@ const PersonalList = ({ reload }) => {
                 className="bg-[#0f172a] p-5 rounded-2xl border border-slate-800 flex items-center justify-between group hover:border-orange-500/40 hover:bg-[#161e31] transition-all duration-300 shadow-lg"
               >
                 <div className="flex items-center gap-4">
-                  {/* Icono por Rol */}
                   <div
                     className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-transform group-hover:scale-110 ${
                       staff.rol === "admin"
