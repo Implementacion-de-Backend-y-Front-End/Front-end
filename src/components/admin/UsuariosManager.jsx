@@ -60,11 +60,11 @@ const UsuariosManager = () => {
       {/* SECCIÓN 1: Formulario de Alta */}
       <section className="max-w-4xl mx-auto bg-[#1e293b] p-8 rounded-3xl border border-slate-800 shadow-2xl mb-12 animate-in fade-in zoom-in duration-500">
         <div className="flex flex-col items-center mb-10">
-          <div className="bg-orange-600/10 p-4 rounded-full mb-3">
-            <UserPlus className="text-orange-500" size={32} />
+          <div className="bg-cyan-600/10 p-4 rounded-full mb-3">
+            <UserPlus className="text-cyan-400" size={32} />
           </div>
           <h2 className="text-3xl font-black uppercase text-white italic tracking-tighter text-center">
-            Alta de <span className="text-orange-500">Personal</span>
+            Alta de <span className="text-cyan-400">Personal</span>
           </h2>
           <p className="text-slate-500 text-[10px] font-black uppercase tracking-[3px]">
             Leños Rellenos Admin
@@ -118,12 +118,12 @@ const UsuariosManager = () => {
               </label>
               <div className="relative flex items-center">
                 <ShieldCheck
-                  className="absolute ml-4 text-orange-500"
+                  className="absolute ml-4 text-cyan-400"
                   size={18}
                 />
                 <select
                   name="rol"
-                  className="w-full bg-[#0f172a] p-4 pl-12 rounded-2xl border border-slate-800 text-white font-bold appearance-none outline-none focus:border-orange-500 cursor-pointer"
+                  className="w-full bg-[#0f172a] p-4 pl-12 rounded-2xl border border-slate-800 text-white font-bold appearance-none outline-none focus:border-cyan-500 cursor-pointer"
                   value={formData.rol}
                   onChange={handleChange}
                 >
@@ -136,7 +136,7 @@ const UsuariosManager = () => {
 
           <button
             disabled={loading}
-            className="w-full bg-orange-600 py-5 rounded-2xl font-black uppercase tracking-[3px] text-white hover:bg-orange-700 active:scale-[0.98] transition-all flex justify-center items-center gap-3 shadow-xl shadow-orange-900/20 mt-4"
+            className="w-full bg-cyan-600 py-5 rounded-2xl font-black uppercase tracking-[3px] text-white hover:bg-cyan-700 active:scale-[0.98] transition-all flex justify-center items-center gap-3 shadow-xl shadow-cyan-900/20 mt-4"
           >
             {loading ? (
               <Loader2 className="animate-spin" />
@@ -155,7 +155,7 @@ const UsuariosManager = () => {
       {/* BOTÓN FLOTANTE */}
       <button
         onClick={scrollToUsuarios}
-        className="fixed bottom-8 right-8 bg-orange-600 text-white px-6 py-4 rounded-full shadow-2xl shadow-orange-900/40 font-black uppercase italic text-xs flex items-center gap-3 hover:bg-orange-500 transition-all hover:-translate-y-2 active:scale-95 z-50 border-2 border-orange-400/20"
+        className="fixed bottom-8 right-8 bg-cyan-600 text-white px-6 py-4 rounded-full shadow-2xl shadow-cyan-900/40 font-black uppercase italic text-xs flex items-center gap-3 hover:bg-cyan-500 transition-all hover:-translate-y-2 active:scale-95 z-50 border-2 border-cyan-400/20"
       >
         <Users size={20} />
         Ver Usuarios
@@ -170,10 +170,10 @@ const InputGroup = ({ label, icon, ...props }) => (
       {label}
     </label>
     <div className="relative flex items-center">
-      <div className="absolute ml-4 text-orange-500">{icon}</div>
+      <div className="absolute ml-4 text-cyan-400">{icon}</div>
       <input
         {...props}
-        className="w-full bg-[#0f172a] p-4 pl-12 rounded-2xl border border-slate-800 outline-none focus:border-orange-500 text-white transition-all font-medium placeholder:text-slate-700"
+        className="w-full bg-[#0f172a] p-4 pl-12 rounded-2xl border border-slate-800 outline-none focus:border-cyan-500 text-white transition-all font-medium placeholder:text-slate-700"
         required
       />
     </div>

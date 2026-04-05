@@ -10,9 +10,9 @@ const Sidebar = ({ activeTab, setActiveTab }) => {
   ];
 
   return (
-    <aside className="w-64 bg-[#1e293b] border-r border-slate-800 p-6 flex flex-col min-h-screen">
+    <aside className="w-full md:w-64 bg-[#1e293b] border-b border-slate-800 md:border-r md:border-b-0 p-6 flex flex-col md:min-h-screen">
       <div className="mb-10 px-2 text-center">
-        <h2 className="text-orange-500 font-black uppercase italic tracking-tighter text-xl">
+        <h2 className="text-cyan-400 font-black uppercase italic tracking-tighter text-xl">
           Leños <span className="text-white">Panel</span>
         </h2>
       </div>
@@ -24,7 +24,7 @@ const Sidebar = ({ activeTab, setActiveTab }) => {
             onClick={() => setActiveTab(item.id)}
             className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl font-bold transition-all uppercase text-[11px] tracking-wider ${
               activeTab === item.id
-                ? "bg-orange-600 text-white shadow-lg shadow-orange-900/40"
+                ? "bg-cyan-600 text-white shadow-lg shadow-cyan-900/40"
                 : "text-slate-400 hover:bg-[#0f172a] hover:text-white"
             }`}
           >

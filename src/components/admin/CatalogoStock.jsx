@@ -21,7 +21,7 @@ const CatalogoStock = ({ productos = [], refresh }) => {
   return (
     <div className="bg-[#1e293b] p-8 rounded-3xl border border-slate-800 shadow-2xl h-full text-white">
       <h2 className="text-xl font-black uppercase italic mb-6 text-center">
-        Resumen de <span className="text-orange-500">Stock</span>
+        Resumen de <span className="text-cyan-400">Stock</span>
       </h2>
 
       <div className="space-y-4 overflow-y-auto max-h-[600px] pr-2 custom-scrollbar">
@@ -33,7 +33,7 @@ const CatalogoStock = ({ productos = [], refresh }) => {
           productos.map((item) => (
             <div
               key={item._id}
-              className="bg-[#0f172a] p-4 rounded-2xl border border-slate-800 flex items-center justify-between group hover:border-orange-500/50 transition-all"
+              className="bg-[#0f172a] p-4 rounded-2xl border border-slate-800 flex items-center justify-between group hover:border-cyan-500/50 transition-all"
             >
               <div className="flex items-center gap-4">
                 <div className="w-14 h-14 bg-slate-800 rounded-xl overflow-hidden border border-slate-700 flex-shrink-0">
@@ -44,11 +44,11 @@ const CatalogoStock = ({ productos = [], refresh }) => {
                       className="w-full h-full object-cover"
                       onError={(e) => {
                         e.target.style.display = "none";
-                        e.target.parentElement.innerHTML = `<div class="w-full h-full flex items-center justify-center font-black text-orange-500">${item.nombre.charAt(0)}</div>`;
+                        e.target.parentElement.innerHTML = `<div class="w-full h-full flex items-center justify-center font-black text-cyan-400">${item.nombre.charAt(0)}</div>`;
                       }}
                     />
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center font-black text-orange-500">
+                    <div className="w-full h-full flex items-center justify-center font-black text-cyan-400">
                       {item.nombre?.charAt(0) || "L"}
                     </div>
                   )}
@@ -61,7 +61,7 @@ const CatalogoStock = ({ productos = [], refresh }) => {
                     <p className="text-[9px] text-slate-500 uppercase font-black px-2 py-0.5 bg-slate-900 rounded-md">
                       {item.categoria}
                     </p>
-                    <p className="text-[9px] text-orange-500 uppercase font-black px-2 py-0.5 bg-orange-500/10 rounded-md">
+                    <p className="text-[9px] text-cyan-400 uppercase font-black px-2 py-0.5 bg-cyan-500/10 rounded-md">
                       ${item.precio}
                     </p>
                   </div>
@@ -69,7 +69,7 @@ const CatalogoStock = ({ productos = [], refresh }) => {
               </div>
               <div className="flex items-center gap-4">
                 <div className="text-right">
-                  <span className="block font-mono text-orange-500 font-black text-sm">
+                  <span className="block font-mono text-cyan-400 font-black text-sm">
                     {item.stock} pz
                   </span>
                 </div>

@@ -61,13 +61,13 @@ const InventarioEditor = ({ refresh }) => {
 
   return (
     <div className="max-w-xl mx-auto bg-[#1e293b] p-8 rounded-3xl border border-slate-800 shadow-2xl text-white">
-      <h2 className="text-xl font-black uppercase italic mb-8 text-center text-orange-500">
+      <h2 className="text-xl font-black uppercase italic mb-8 text-center text-cyan-400">
         NUEVO PRODUCTO
       </h2>
 
       <form onSubmit={handleSubmit} className="space-y-5">
         <input
-          className="w-full bg-[#0f172a] border border-slate-800 p-4 rounded-2xl outline-none focus:border-orange-500"
+          className="w-full bg-[#0f172a] border border-slate-800 p-4 rounded-2xl outline-none focus:border-cyan-500"
           placeholder="Nombre del Leño"
           value={formData.nombre}
           onChange={(e) => setFormData({ ...formData, nombre: e.target.value })}
@@ -77,7 +77,7 @@ const InventarioEditor = ({ refresh }) => {
         <div className="grid grid-cols-2 gap-4">
           <input
             type="number"
-            className="bg-[#0f172a] border border-slate-800 p-4 rounded-2xl outline-none focus:border-orange-500"
+            className="bg-[#0f172a] border border-slate-800 p-4 rounded-2xl outline-none focus:border-cyan-500"
             placeholder="Precio"
             value={formData.precio}
             onChange={(e) =>
@@ -87,7 +87,7 @@ const InventarioEditor = ({ refresh }) => {
           />
           <input
             type="number"
-            className="bg-[#0f172a] border border-slate-800 p-4 rounded-2xl outline-none focus:border-orange-500"
+            className="bg-[#0f172a] border border-slate-800 p-4 rounded-2xl outline-none focus:border-cyan-500"
             placeholder="Stock"
             value={formData.stock}
             onChange={(e) =>
@@ -103,7 +103,7 @@ const InventarioEditor = ({ refresh }) => {
             Categoría
           </label>
           <select
-            className="w-full bg-[#0f172a] border border-slate-800 p-4 rounded-2xl outline-none focus:border-orange-500 appearance-none cursor-pointer"
+            className="w-full bg-[#0f172a] border border-slate-800 p-4 rounded-2xl outline-none focus:border-cyan-500 appearance-none cursor-pointer"
             value={formData.categoria}
             onChange={(e) =>
               setFormData({ ...formData, categoria: e.target.value })
@@ -117,7 +117,7 @@ const InventarioEditor = ({ refresh }) => {
         </div>
 
         <textarea
-          className="w-full bg-[#0f172a] border border-slate-800 p-4 rounded-2xl h-24 outline-none focus:border-orange-500 resize-none"
+          className="w-full bg-[#0f172a] border border-slate-800 p-4 rounded-2xl h-24 outline-none focus:border-cyan-500 resize-none"
           placeholder="Descripción..."
           value={formData.descripcion}
           onChange={(e) =>
@@ -147,7 +147,7 @@ const InventarioEditor = ({ refresh }) => {
               <img
                 src={preview}
                 alt="Preview"
-                className="w-40 h-40 object-cover rounded-2xl border-2 border-orange-500 shadow-lg"
+                className="w-40 h-40 object-cover rounded-2xl border-2 border-cyan-500 shadow-lg"
               />
             ) : (
               <div className="w-40 h-40 rounded-2xl border-2 border-dashed border-slate-800 flex items-center justify-center text-slate-700">
@@ -159,7 +159,7 @@ const InventarioEditor = ({ refresh }) => {
 
         <button
           disabled={loading}
-          className="w-full bg-orange-600 hover:bg-orange-700 py-4 rounded-2xl font-black uppercase tracking-widest transition-all"
+          className="w-full bg-cyan-600 hover:bg-cyan-700 py-4 rounded-2xl font-black uppercase tracking-widest transition-all"
         >
           {loading ? "GUARDANDO..." : "GUARDAR PRODUCTO"}
         </button>

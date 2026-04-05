@@ -28,7 +28,7 @@ const AdminDashboard = () => {
   }, []);
 
   return (
-    <div className="flex min-h-screen bg-[#0f172a] text-gray-100">
+    <div className="flex flex-col md:flex-row min-h-screen bg-[#0f172a] text-gray-100">
       <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
 
       <main className="flex-1 p-8">

@@ -100,7 +100,7 @@ const PedidosManager = () => {
 
   if (loading) {
     return (
-      <div className="p-20 text-center font-black animate-pulse text-orange-500">
+      <div className="p-20 text-center font-black animate-pulse text-cyan-400">
         BUSCANDO PEDIDOS EN EL SERVIDOR...
       </div>
     );
@@ -109,11 +109,11 @@ const PedidosManager = () => {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center bg-[#1e293b] p-6 rounded-3xl border border-slate-800">
-        <h2 className="text-xl font-black uppercase italic text-orange-500">
+        <h2 className="text-xl font-black uppercase italic text-cyan-400">
           Pedidos por Procesar
         </h2>
         <div className="bg-[#0f172a] px-4 py-2 rounded-full border border-slate-700 text-xs font-bold uppercase">
-          Pendientes: <span className="text-orange-500">{pedidos.length}</span>
+          Pendientes: <span className="text-cyan-400">{pedidos.length}</span>
         </div>
       </div>
 
@@ -143,7 +143,7 @@ const PedidosManager = () => {
               </div>
               <button
                 onClick={() => setPedidoSeleccionado(pedido)}
-                className="bg-[#0f172a] hover:bg-orange-600 text-white px-6 py-3 rounded-xl transition-all flex gap-2 items-center text-xs font-black uppercase"
+                className="bg-[#0f172a] hover:bg-cyan-600 text-white px-6 py-3 rounded-xl transition-all flex gap-2 items-center text-xs font-black uppercase"
               >
                 <Eye size={16} /> Detalles
               </button>
@@ -163,16 +163,16 @@ const PedidosManager = () => {
               <X size={20} />
             </button>
 
-            <h2 className="text-xl font-black uppercase italic mb-4 text-orange-500 text-center">
+            <h2 className="text-xl font-black uppercase italic mb-4 text-cyan-400 text-center">
               Detalle del Pedido
             </h2>
 
             {/* FOLIO DESTACADO */}
-            <div className="bg-orange-500/10 border border-orange-500/30 p-4 rounded-2xl mb-4 text-center">
-              <p className="text-[10px] text-orange-400 uppercase font-black">
+            <div className="bg-cyan-500/10 border border-cyan-500/30 p-4 rounded-2xl mb-4 text-center">
+              <p className="text-[10px] text-cyan-400 uppercase font-black">
                 Folio
               </p>
-              <p className="text-2xl font-black text-orange-500">
+              <p className="text-2xl font-black text-cyan-400">
                 {pedidoSeleccionado.folio}
               </p>
             </div>
@@ -211,7 +211,7 @@ const PedidosManager = () => {
                     </p>
                   )}
                   {pedidoSeleccionado.direccion?.referencia && (
-                    <p className="text-orange-400 text-xs italic mt-1">
+                    <p className="text-cyan-400 text-xs italic mt-1">
                       Ref: {pedidoSeleccionado.direccion.referencia}
                     </p>
                   )}
@@ -233,7 +233,7 @@ const PedidosManager = () => {
                         {p.nombre}
                       </span>
                       <div className="flex items-center gap-3">
-                        <span className="text-xs bg-orange-600/20 text-orange-500 px-2 py-0.5 rounded font-black">
+                        <span className="text-xs bg-cyan-600/20 text-cyan-500 px-2 py-0.5 rounded font-black">
                           x{p.cantidad}
                         </span>
                         <span className="text-xs text-green-400 font-bold">
@@ -299,7 +299,7 @@ const PedidosManager = () => {
               <X size={20} />
             </button>
 
-            <h2 className="text-xl font-black uppercase italic mb-2 text-orange-500 text-center">
+            <h2 className="text-xl font-black uppercase italic mb-2 text-cyan-400 text-center">
               Asignar Repartidor
             </h2>
             <p className="text-center text-slate-400 text-xs mb-6">
@@ -322,12 +322,12 @@ const PedidosManager = () => {
                       onClick={() => setRepartidorSeleccionado(repartidor)}
                       className={`p-4 rounded-xl border cursor-pointer transition-all flex items-center gap-3 ${
                         repartidorSeleccionado?._id === repartidor._id
-                          ? "border-orange-500 bg-orange-500/10"
+                          ? "border-cyan-500 bg-cyan-500/10"
                           : "border-slate-800 bg-slate-900/50 hover:border-slate-600"
                       }`}
                     >
-                      <div className="w-10 h-10 bg-orange-500/20 rounded-full flex items-center justify-center">
-                        <Truck size={18} className="text-orange-500" />
+                      <div className="w-10 h-10 bg-cyan-500/20 rounded-full flex items-center justify-center">
+                        <Truck size={18} className="text-cyan-500" />
                       </div>
                       <div className="flex-1">
                         <div className="text-sm text-white font-bold uppercase">
@@ -338,7 +338,7 @@ const PedidosManager = () => {
                         </div>
                       </div>
                       {repartidorSeleccionado?._id === repartidor._id && (
-                        <Check size={18} className="text-orange-500" />
+                        <Check size={18} className="text-cyan-400" />
                       )}
                     </div>
                   ))

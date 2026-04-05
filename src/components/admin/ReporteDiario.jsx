@@ -39,7 +39,7 @@ const ReporteDiario = () => {
   if (loading) {
     return (
       <div className="p-20 text-center">
-        <RefreshCw className="animate-spin mx-auto text-orange-500" size={32} />
+        <RefreshCw className="animate-spin mx-auto text-cyan-400" size={32} />
         <p className="mt-4 text-slate-400 font-bold">Generando reporte...</p>
       </div>
     );
@@ -50,7 +50,7 @@ const ReporteDiario = () => {
       {/* HEADER */}
       <div className="flex justify-between items-center bg-[#1e293b] p-6 rounded-3xl border border-slate-800">
         <div>
-          <h2 className="text-xl font-black uppercase italic text-orange-500">
+          <h2 className="text-xl font-black uppercase italic text-cyan-400">
             Reporte Diario
           </h2>
           <p className="text-slate-400 text-xs mt-1">
@@ -64,7 +64,7 @@ const ReporteDiario = () => {
         </div>
         <button
           onClick={fetchData}
-          className="bg-[#0f172a] hover:bg-orange-600 text-white px-4 py-2 rounded-xl transition-all flex gap-2 items-center text-xs font-black uppercase"
+          className="bg-[#0f172a] hover:bg-cyan-600 text-white px-4 py-2 rounded-xl transition-all flex gap-2 items-center text-xs font-black uppercase"
         >
           <RefreshCw size={14} /> Actualizar
         </button>
@@ -107,32 +107,32 @@ const ReporteDiario = () => {
         </div>
 
         {/* Pedidos Pendientes */}
-        <div className="bg-gradient-to-br from-yellow-600/20 to-yellow-900/20 p-6 rounded-2xl border border-yellow-600/30">
+        <div className="bg-gradient-to-br from-cyan-600/20 to-cyan-900/20 p-6 rounded-2xl border border-cyan-600/30">
           <div className="flex items-center gap-3 mb-3">
-            <div className="w-10 h-10 bg-yellow-500/20 rounded-xl flex items-center justify-center">
-              <Clock size={20} className="text-yellow-500" />
+            <div className="w-10 h-10 bg-cyan-500/20 rounded-xl flex items-center justify-center">
+              <Clock size={20} className="text-cyan-500" />
             </div>
-            <span className="text-[10px] uppercase tracking-widest text-yellow-400 font-black">
+            <span className="text-[10px] uppercase tracking-widest text-cyan-400 font-black">
               Pendientes
             </span>
           </div>
-          <p className="text-3xl font-black text-yellow-500">
+          <p className="text-3xl font-black text-cyan-500">
             {reporte?.kpis?.pedidosPendientes || 0}
           </p>
           <p className="text-xs text-slate-500 mt-1">por procesar</p>
         </div>
 
         {/* En Camino */}
-        <div className="bg-gradient-to-br from-orange-600/20 to-orange-900/20 p-6 rounded-2xl border border-orange-600/30">
+        <div className="bg-gradient-to-br from-slate-600/20 to-slate-900/20 p-6 rounded-2xl border border-slate-600/30">
           <div className="flex items-center gap-3 mb-3">
-            <div className="w-10 h-10 bg-orange-500/20 rounded-xl flex items-center justify-center">
-              <Truck size={20} className="text-orange-500" />
+            <div className="w-10 h-10 bg-cyan-500/20 rounded-xl flex items-center justify-center">
+              <Truck size={20} className="text-cyan-500" />
             </div>
-            <span className="text-[10px] uppercase tracking-widest text-orange-400 font-black">
+            <span className="text-[10px] uppercase tracking-widest text-cyan-400 font-black">
               En Camino
             </span>
           </div>
-          <p className="text-3xl font-black text-orange-500">
+          <p className="text-3xl font-black text-cyan-500">
             {reporte?.kpis?.pedidosEnCamino || 0}
           </p>
           <p className="text-xs text-slate-500 mt-1">en ruta</p>
@@ -144,11 +144,11 @@ const ReporteDiario = () => {
         {/* Producto Estrella */}
         <div className="bg-[#1e293b] p-6 rounded-2xl border border-slate-800">
           <div className="flex items-center gap-3 mb-4">
-            <div className="w-12 h-12 bg-yellow-500/20 rounded-xl flex items-center justify-center">
-              <Star size={24} className="text-yellow-500" />
+            <div className="w-12 h-12 bg-cyan-500/20 rounded-xl flex items-center justify-center">
+              <Star size={24} className="text-cyan-500" />
             </div>
             <div>
-              <h3 className="text-sm font-black uppercase text-yellow-500">
+              <h3 className="text-sm font-black uppercase text-cyan-500">
                 Producto Estrella
               </h3>
               <p className="text-[10px] text-slate-500">Más vendido hoy</p>
@@ -158,7 +158,7 @@ const ReporteDiario = () => {
             <p className="text-xl font-black text-white">
               {reporte?.kpis?.productoEstrella?.nombre || "Sin ventas"}
             </p>
-            <p className="text-sm text-orange-500 font-bold mt-1">
+            <p className="text-sm text-cyan-400 font-bold mt-1">
               {reporte?.kpis?.productoEstrella?.cantidad || 0} unidades vendidas
             </p>
           </div>
@@ -193,7 +193,7 @@ const ReporteDiario = () => {
                   className={`flex justify-between items-center p-3 rounded-xl border ${
                     producto.stock <= 0
                       ? "bg-red-500/10 border-red-500/30"
-                      : "bg-yellow-500/10 border-yellow-500/30"
+                      : "bg-cyan-500/10 border-cyan-500/30"
                   }`}
                 >
                   <span className="text-sm text-white font-bold">
@@ -203,7 +203,7 @@ const ReporteDiario = () => {
                     className={`text-sm font-black px-2 py-1 rounded ${
                       producto.stock <= 0
                         ? "bg-red-500 text-white"
-                        : "bg-yellow-500/20 text-yellow-500"
+                        : "bg-cyan-500/20 text-cyan-500"
                     }`}
                   >
                     {producto.stock <= 0 ? "AGOTADO" : `${producto.stock} uds`}
@@ -218,8 +218,8 @@ const ReporteDiario = () => {
       {/* INVENTARIO COMPLETO */}
       <div className="bg-[#1e293b] p-6 rounded-2xl border border-slate-800">
         <div className="flex items-center gap-3 mb-4">
-          <TrendingUp size={20} className="text-orange-500" />
-          <h3 className="text-sm font-black uppercase text-orange-500">
+          <TrendingUp size={20} className="text-cyan-400" />
+          <h3 className="text-sm font-black uppercase text-cyan-400">
             Inventario Completo
           </h3>
         </div>
@@ -250,7 +250,7 @@ const ReporteDiario = () => {
                     producto.stock <= 0
                       ? "text-red-500"
                       : producto.stock < 10
-                        ? "text-yellow-500"
+                        ? "text-cyan-400"
                         : "text-green-500"
                   }`}
                 >

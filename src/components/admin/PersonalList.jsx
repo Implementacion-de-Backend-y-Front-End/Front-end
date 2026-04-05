@@ -45,7 +45,7 @@ const PersonalList = ({ reload }) => {
       <div className="flex flex-col md:flex-row items-center justify-between mb-8 gap-4">
         <div>
           <h2 className="text-2xl font-black uppercase italic text-white tracking-tighter">
-            Equipo <span className="text-orange-500">Registrado</span>
+            Equipo <span className="text-cyan-400">Registrado</span>
           </h2>
           <p className="text-[10px] text-slate-500 font-black uppercase tracking-[3px] mt-1">
             Administradores y Repartidores activos
@@ -54,7 +54,7 @@ const PersonalList = ({ reload }) => {
 
         <div className="bg-[#0f172a] px-6 py-2 rounded-2xl border border-slate-800 flex items-center gap-3">
           <div className="flex -space-x-2">
-            <div className="w-6 h-6 rounded-full bg-orange-600 border-2 border-[#0f172a]"></div>
+            <div className="w-6 h-6 rounded-full bg-cyan-600 border-2 border-[#0f172a]"></div>
             <div className="w-6 h-6 rounded-full bg-purple-600 border-2 border-[#0f172a]"></div>
           </div>
           <span className="text-white font-black text-sm uppercase">
@@ -66,7 +66,7 @@ const PersonalList = ({ reload }) => {
       <div className="space-y-4">
         {loading ? (
           <div className="flex flex-col items-center justify-center py-24 text-slate-500">
-            <Loader2 className="animate-spin mb-4 text-orange-500" size={40} />
+            <Loader2 className="animate-spin mb-4 text-cyan-400" size={40} />
             <span className="text-xs font-black uppercase tracking-widest">
               Sincronizando base de datos...
             </span>
@@ -82,7 +82,7 @@ const PersonalList = ({ reload }) => {
             {personal.map((staff) => (
               <div
                 key={staff._id}
-                className="bg-[#0f172a] p-5 rounded-2xl border border-slate-800 flex items-center justify-between group hover:border-orange-500/40 hover:bg-[#161e31] transition-all duration-300 shadow-lg"
+                className="bg-[#0f172a] p-5 rounded-2xl border border-slate-800 flex items-center justify-between group hover:border-cyan-500/40 hover:bg-[#161e31] transition-all duration-300 shadow-lg"
               >
                 <div className="flex items-center gap-4">
                   <div
