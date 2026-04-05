@@ -1,43 +1,34 @@
 import { useState, useContext } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
-import { useNavigate, Link } from "react-router-dom";
+import { Eye, EyeOff, Loader2 } from "lucide-react";
 
 const Login = () => {
+  const { login } = useContext(AuthContext);
+  const navigate = useNavigate();
   const [telefono, setTelefono] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-
-  const { login } = useContext(AuthContext);
-  const navigate = useNavigate();
+  const [error, setError] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+    setError("");
 
     try {
-      const data = await login({ telefono, password });
+      const res = await login({ telefono, password });
 
-      const user = data?.user || data;
-      const rol = user?.rol;
-      const nombre = user?.nombre || "Usuario";
-
-      alert(`¡Hola de nuevo, ${nombre}! 🔥`);
-
-      switch (rol) {
-        case "admin":
-          navigate("/admin");
-          break;
-        case "repartidor":
-          navigate("/repartidor");
-          break;
-        default:
-          navigate("/");
-          break;
+      if (res?.user?.rol === "admin") {
+        navigate("/admin");
+      } else if (res?.user?.rol === "repartidor") {
+        navigate("/repartidor");
+      } else {
+        navigate("/menu");
       }
     } catch (error) {
-      console.error("Error en login:", error);
-      alert(
+      setError(
         error.response?.data?.message || "Teléfono o contraseña incorrectos",
       );
     } finally {
@@ -46,88 +37,108 @@ const Login = () => {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-orange-50 p-4">
-      <form
-        onSubmit={handleSubmit}
-        className="p-8 bg-white shadow-xl rounded-2xl w-full max-w-md border-t-8 border-orange-500 animate-in fade-in zoom-in duration-300"
-      >
-        <div className="text-center mb-6">
-          <h2 className="text-3xl font-black text-gray-800 tracking-tighter uppercase">
-            🪵 LEÑOS <span className="text-orange-600">RELLENOS</span>
-          </h2>
-          <p className="text-gray-500 text-sm mt-2">
-            Inicia sesión con tu número de teléfono
-          </p>
+    <div className="min-h-screen flex items-center justify-center bg-[#FDF6E3] px-4 py-12">
+      <div className="w-full max-w-md">
+        {/* Logo */}
+        <div className="text-center mb-8">
+          <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-[#8B4513] flex items-center justify-center shadow-lg">
+            <span className="text-4xl">🪵</span>
+          </div>
+          <h1 className="text-2xl font-black text-[#5D3A1A] uppercase tracking-wide">
+            Bienvenido de vuelta
+          </h1>
+          <p className="text-[#8B6914] text-sm mt-1">Ingresa para continuar</p>
         </div>
 
-        <div className="space-y-4">
-          <div>
-            <label className="block text-gray-700 font-bold mb-1 text-sm">
-              Teléfono
-            </label>
-            <input
-              type="text"
-              className="w-full px-4 py-3 border-2 rounded-xl focus:border-orange-500 outline-none transition-all placeholder:text-gray-300"
-              value={telefono}
-              onChange={(e) => setTelefono(e.target.value)}
-              placeholder="Ej. 4615289540"
-              required
-            />
-          </div>
+        {/* Formulario */}
+        <form
+          onSubmit={handleSubmit}
+          className="bg-white rounded-3xl shadow-xl p-8 border-t-4 border-[#8B4513]"
+        >
+          {error && (
+            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl mb-6 text-sm">
+              {error}
+            </div>
+          )}
 
-          <div className="relative">
-            <label className="block text-gray-700 font-bold mb-1 text-sm">
-              Contraseña
-            </label>
-            <input
-              type={showPassword ? "text" : "password"}
-              className="w-full px-4 py-3 border-2 rounded-xl focus:border-orange-500 outline-none transition-all placeholder:text-gray-300"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="••••••••"
-              required
-            />
+          <div className="space-y-5">
+            <div>
+              <label className="block text-sm font-bold text-[#5D3A1A] mb-2">
+                Teléfono
+              </label>
+              <input
+                type="tel"
+                value={telefono}
+                onChange={(e) => setTelefono(e.target.value)}
+                required
+                className="w-full px-4 py-3 border-2 border-[#E8D5B7] rounded-xl focus:ring-2 focus:ring-[#8B4513] focus:border-[#8B4513] transition-all bg-[#FFFDF7]"
+                placeholder="Ej: 6141234567"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-bold text-[#5D3A1A] mb-2">
+                Contraseña
+              </label>
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  className="w-full px-4 py-3 border-2 border-[#E8D5B7] rounded-xl focus:ring-2 focus:ring-[#8B4513] focus:border-[#8B4513] transition-all pr-12 bg-[#FFFDF7]"
+                  placeholder="Tu contraseña"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-3 text-[#8B6914] hover:text-[#5D3A1A]"
+                >
+                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                </button>
+              </div>
+            </div>
+
             <button
-              type="button"
-              onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-4 top-10 text-xl"
+              type="submit"
+              disabled={loading}
+              className="w-full bg-[#8B4513] text-white py-4 rounded-xl font-bold uppercase tracking-wide shadow-lg hover:bg-[#6B3410] transition-all active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2"
             >
-              {showPassword ? "🙈" : "👁️"}
+              {loading ? (
+                <Loader2 className="animate-spin" size={20} />
+              ) : (
+                "Iniciar Sesión"
+              )}
             </button>
           </div>
-        </div>
 
-        <div className="text-right mt-3">
-          <Link
-            to="/forgot-password"
-            className="text-xs font-bold text-orange-600 hover:text-orange-800 transition-colors uppercase tracking-wider"
-          >
-            ¿Olvidaste tu contraseña?
-          </Link>
-        </div>
-
-        <button
-          type="submit"
-          disabled={loading}
-          className={`w-full mt-6 ${
-            loading ? "bg-gray-400" : "bg-orange-500 hover:bg-orange-600"
-          } text-white font-black py-4 rounded-xl transition-all duration-300 shadow-lg transform active:scale-95 uppercase tracking-widest`}
-        >
-          {loading ? "VERIFICANDO..." : "ENTRAR"}
-        </button>
-
-        <div className="mt-8 text-center border-t border-gray-100 pt-6">
-          <p className="text-gray-600 text-sm font-medium">
-            ¿No tienes cuenta?{" "}
+          <div className="mt-6 text-center">
             <Link
-              to="/register"
-              className="text-orange-600 font-black hover:underline"
+              to="/forgot-password"
+              className="text-[#8B4513] text-sm font-medium hover:text-[#5D3A1A] transition-colors"
             >
-              REGÍSTRATE AQUÍ
+              ¿Olvidaste tu contraseña?
             </Link>
-          </p>
-        </div>
-      </form>
+          </div>
+        </form>
+
+        <p className="text-center mt-6 text-[#7A6B5A]">
+          ¿No tienes cuenta?{" "}
+          <Link
+            to="/register"
+            className="text-[#8B4513] font-bold hover:text-[#5D3A1A]"
+          >
+            Regístrate aquí
+          </Link>
+        </p>
+
+        <Link
+          to="/"
+          className="block text-center mt-4 text-[#8B6914] text-sm hover:text-[#5D3A1A]"
+        >
+          ← Volver al inicio
+        </Link>
+      </div>
     </div>
   );
 };

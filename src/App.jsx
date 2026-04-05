@@ -13,6 +13,7 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Profile from "./pages/Profile";
 import ForgotPassword from "./pages/ForgotPassword";
+import Landing from "./pages/Landing";
 // Importamos los nuevos componentes
 import Menu from "./components/Menu";
 import MisPedidos from "./components/MisPedidos";
@@ -25,32 +26,32 @@ const BarraNavegacionInferior = () => {
   const { user } = useContext(AuthContext);
 
   // Solo se muestra si el usuario está logueado y es un CLIENTE
-  if (!user || user.rol === "admin") return null;
+  if (!user || user.rol === "admin" || user.rol === "repartidor") return null;
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-white border-t flex justify-around p-3 shadow-[0_-5px_15px_rgba(0,0,0,0.1)] z-50">
+    <nav className="fixed bottom-0 left-0 right-0 bg-[#FDF6E3] border-t-2 border-[#E8D5B7] flex justify-around p-3 shadow-[0_-5px_15px_rgba(0,0,0,0.1)] z-50">
       <Link
-        to="/"
-        className="flex flex-col items-center text-gray-500 hover:text-orange-600 transition-colors"
+        to="/menu"
+        className="flex flex-col items-center text-[#8B4513] hover:text-[#5D3A1A] transition-colors"
       >
-        <span className="text-2xl">🏠</span>
-        <span className="text-[10px] font-black uppercase italic">Menú</span>
+        <span className="text-2xl">🪵</span>
+        <span className="text-[10px] font-black uppercase">Menú</span>
       </Link>
 
       <Link
         to="/checkout"
-        className="flex flex-col items-center text-orange-600"
+        className="flex flex-col items-center text-[#8B4513] hover:text-[#5D3A1A] transition-colors"
       >
         <span className="text-2xl">🛒</span>
-        <span className="text-[10px] font-black uppercase italic">Carrito</span>
+        <span className="text-[10px] font-black uppercase">Carrito</span>
       </Link>
 
       <Link
         to="/mis-pedidos"
-        className="flex flex-col items-center text-gray-500 hover:text-orange-600 transition-colors"
+        className="flex flex-col items-center text-[#8B4513] hover:text-[#5D3A1A] transition-colors"
       >
         <span className="text-2xl">📋</span>
-        <span className="text-[10px] font-black uppercase italic">Pedidos</span>
+        <span className="text-[10px] font-black uppercase">Pedidos</span>
       </Link>
     </nav>
   );
@@ -73,12 +74,13 @@ const ClienteRoute = ({ children }) => {
   const { user, loading } = useContext(AuthContext);
   if (loading)
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen bg-[#FDF6E3] flex items-center justify-center text-[#5D3A1A]">
         Cargando...
       </div>
     );
-  if (!user) return <Navigate to="/login" />; // Si no hay usuario, al login
-  if (user.rol === "admin") return <Navigate to="/admin" />; // Si es admin, al dashboard
+  if (!user) return <Navigate to="/" />; // Si no hay usuario, al landing
+  if (user.rol === "admin") return <Navigate to="/admin" />;
+  if (user.rol === "repartidor") return <Navigate to="/repartidor" />;
   return children;
 };
 
@@ -101,11 +103,19 @@ function App() {
         <Navbar />
 
         <div className="pb-20">
-          {" "}
-          {/* Espacio para que el menú inferior no tape el contenido */}
           <Routes>
-            {/* 🏠 AHORA LA RAÍZ MUESTRA EL MENÚ DIRECTAMENTE */}
-            <Route path="/" element={<Menu />} />
+            {/* 🏠 LANDING PAGE (Bienvenida) */}
+            <Route path="/" element={<Landing />} />
+
+            {/* 🍽️ MENÚ DE PRODUCTOS (Solo clientes logueados) */}
+            <Route
+              path="/menu"
+              element={
+                <ClienteRoute>
+                  <Menu />
+                </ClienteRoute>
+              }
+            />
 
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
