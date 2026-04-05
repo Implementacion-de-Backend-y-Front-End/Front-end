@@ -74,8 +74,20 @@ const RepartidorDashboard = () => {
     try {
       const res = await clienteAxios.put(`/api/delivery/entregar/${pedidoId}`);
 
+      // Abrir WhatsApp del cliente
       if (res.data.whatsappCliente) {
         window.open(res.data.whatsappCliente, "_blank");
+      }
+
+      // Abrir WhatsApp de los admins (después de 1 segundo para no bloquear popups)
+      if (res.data.whatsappAdmins && res.data.whatsappAdmins.length > 0) {
+        setTimeout(() => {
+          res.data.whatsappAdmins.forEach((admin, index) => {
+            setTimeout(() => {
+              window.open(admin.url, "_blank");
+            }, index * 500); // Espaciar 500ms entre cada uno
+          });
+        }, 1000);
       }
 
       alert("✅ ¡Pedido entregado con éxito!");
