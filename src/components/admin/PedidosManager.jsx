@@ -1,5 +1,4 @@
-﻿// src/components/admin/PedidosManager.jsx
-import React, { useState, useEffect } from "react";
+﻿import React, { useState, useEffect } from "react";
 import { Eye, X, Check, Truck, Phone } from "lucide-react";
 import clienteAxios from "../../api/axios";
 
@@ -19,6 +18,7 @@ const PedidosManager = () => {
   const fetchPedidos = async () => {
     try {
       setLoading(true);
+      // ✅ RUTA CORREGIDA
       const res = await clienteAxios.get("/api/admin/pending");
       setPedidos(Array.isArray(res.data) ? res.data : []);
     } catch (err) {
@@ -30,6 +30,7 @@ const PedidosManager = () => {
 
   const fetchRepartidores = async () => {
     try {
+      // ✅ RUTA CORREGIDA
       const res = await clienteAxios.get("/api/users");
       const repartidoresFiltrados = res.data.filter(
         (user) => user.rol === "repartidor",
@@ -44,17 +45,17 @@ const PedidosManager = () => {
   const handleConfirmar = async () => {
     if (!pedidoSeleccionado) return;
     try {
+      // ✅ RUTA CORREGIDA
       const res = await clienteAxios.put(
         `/api/admin/accept/${pedidoSeleccionado._id}`,
       );
-      // Abrir WhatsApp en nueva pestaña
       if (res.data.whatsappUrl) {
         window.open(res.data.whatsappUrl, "_blank");
       }
       alert(
         "✅ Pedido confirmado. Se abrió WhatsApp para notificar al cliente.",
       );
-      setMostrarAsignar(true); // Pasar a asignar repartidor
+      setMostrarAsignar(true);
     } catch (err) {
       console.error("Error al confirmar:", err);
       alert("No se pudo confirmar el pedido.");
@@ -65,13 +66,13 @@ const PedidosManager = () => {
   const asignarRepartidor = async () => {
     if (!pedidoSeleccionado || !repartidorSeleccionado) return;
     try {
+      // ✅ RUTA CORREGIDA
       const res = await clienteAxios.put(
         `/api/admin/assign/${pedidoSeleccionado._id}`,
         {
           repartidorId: repartidorSeleccionado._id,
         },
       );
-      // Abrir WhatsApp para el repartidor
       if (res.data.whatsappUrl) {
         window.open(res.data.whatsappUrl, "_blank");
       }
@@ -91,6 +92,7 @@ const PedidosManager = () => {
     if (!window.confirm("¿Estás seguro de que deseas rechazar este pedido?"))
       return;
     try {
+      // ✅ RUTA CORREGIDA
       await clienteAxios.put(`/api/admin/reject/${id}`);
       setPedidoSeleccionado(null);
       fetchPedidos();
