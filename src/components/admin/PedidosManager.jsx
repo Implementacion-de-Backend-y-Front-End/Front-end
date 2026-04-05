@@ -18,7 +18,6 @@ const PedidosManager = () => {
   const fetchPedidos = async () => {
     try {
       setLoading(true);
-      // ✅ RUTA CORREGIDA
       const res = await clienteAxios.get("/api/admin/pending");
       setPedidos(Array.isArray(res.data) ? res.data : []);
     } catch (err) {
@@ -30,14 +29,11 @@ const PedidosManager = () => {
 
   const fetchRepartidores = async () => {
     try {
-      // ✅ RUTA CORREGIDA
-      const res = await clienteAxios.get("/api/users");
-      const repartidoresFiltrados = res.data.filter(
-        (user) => user.rol === "repartidor",
-      );
-      setRepartidores(repartidoresFiltrados);
+      // ✅ CORREGIDO: Usar la ruta correcta
+      const res = await clienteAxios.get("/api/users/repartidores");
+      setRepartidores(Array.isArray(res.data) ? res.data : []);
     } catch (err) {
-      console.error(err);
+      console.error("Error al cargar repartidores:", err);
     }
   };
 
@@ -45,7 +41,6 @@ const PedidosManager = () => {
   const handleConfirmar = async () => {
     if (!pedidoSeleccionado) return;
     try {
-      // ✅ RUTA CORREGIDA
       const res = await clienteAxios.put(
         `/api/admin/accept/${pedidoSeleccionado._id}`,
       );
@@ -55,6 +50,8 @@ const PedidosManager = () => {
       alert(
         "✅ Pedido confirmado. Se abrió WhatsApp para notificar al cliente.",
       );
+      // Recargar repartidores antes de mostrar modal
+      await fetchRepartidores();
       setMostrarAsignar(true);
     } catch (err) {
       console.error("Error al confirmar:", err);
@@ -66,7 +63,6 @@ const PedidosManager = () => {
   const asignarRepartidor = async () => {
     if (!pedidoSeleccionado || !repartidorSeleccionado) return;
     try {
-      // ✅ RUTA CORREGIDA
       const res = await clienteAxios.put(
         `/api/admin/assign/${pedidoSeleccionado._id}`,
         {
@@ -92,7 +88,6 @@ const PedidosManager = () => {
     if (!window.confirm("¿Estás seguro de que deseas rechazar este pedido?"))
       return;
     try {
-      // ✅ RUTA CORREGIDA
       await clienteAxios.put(`/api/admin/reject/${id}`);
       setPedidoSeleccionado(null);
       fetchPedidos();

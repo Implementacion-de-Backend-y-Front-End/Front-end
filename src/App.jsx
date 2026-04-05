@@ -18,6 +18,7 @@ import Menu from "./components/Menu";
 import MisPedidos from "./components/MisPedidos";
 import Checkout from "./components/Checkout";
 import AdminDashboard from "./pages/AdminDashboard";
+import RepartidorDashboard from "./pages/RepartidorDashboard";
 
 // --- COMPONENTE PARA EL MENÚ INFERIOR ---
 const BarraNavegacionInferior = () => {
@@ -81,6 +82,18 @@ const ClienteRoute = ({ children }) => {
   return children;
 };
 
+const RepartidorRoute = ({ children }) => {
+  const { user, loading } = useContext(AuthContext);
+  if (loading)
+    return (
+      <div className="min-h-screen bg-[#0f172a] flex items-center justify-center text-white">
+        Cargando...
+      </div>
+    );
+  if (!user || user.rol !== "repartidor") return <Navigate to="/" />;
+  return children;
+};
+
 function App() {
   return (
     <AuthProvider>
@@ -135,6 +148,16 @@ function App() {
                 <AdminRoute>
                   <AdminDashboard />
                 </AdminRoute>
+              }
+            />
+
+            {/* 🚚 PANEL DE REPARTIDOR */}
+            <Route
+              path="/repartidor"
+              element={
+                <RepartidorRoute>
+                  <RepartidorDashboard />
+                </RepartidorRoute>
               }
             />
           </Routes>
