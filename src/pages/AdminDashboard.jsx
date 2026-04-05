@@ -5,6 +5,7 @@ import PedidosManager from "../components/admin/PedidosManager";
 import UsuariosManager from "../components/admin/UsuariosManager";
 import InventarioEditor from "../components/admin/InventarioEditor";
 import CatalogoStock from "../components/admin/CatalogoStock";
+import ReporteDiario from "../components/admin/ReporteDiario";
 
 const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState("pedidos");
@@ -55,16 +56,7 @@ const AdminDashboard = () => {
           {activeTab === "personal" && <UsuariosManager />}
 
           {/* 5. REPORTE */}
-          {activeTab === "reporte" && (
-            <div className="bg-[#1e293b] p-20 rounded-3xl border border-slate-800 text-center">
-              <h2 className="text-2xl font-black uppercase italic text-orange-500">
-                Reporte de Ventas
-              </h2>
-              <p className="text-slate-500 mt-2">
-                Próximamente: Gráficas de ingresos diarios.
-              </p>
-            </div>
-          )}
+          {activeTab === "reporte" && <ReporteDiario />}
         </div>
       </main>
     </div>
