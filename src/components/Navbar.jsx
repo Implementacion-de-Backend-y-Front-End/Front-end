@@ -51,9 +51,7 @@ const Navbar = () => {
               <Link
                 to="/admin/repartidores"
                 className="text-xs font-black text-orange-600 border-b-2 border-orange-600 hover:text-orange-800 transition"
-              >
-                GESTIÓN
-              </Link>
+              ></Link>
             )}
 
             <button
